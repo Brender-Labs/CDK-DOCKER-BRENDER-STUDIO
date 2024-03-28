@@ -28,7 +28,7 @@ image_exists_in_ecr() {
     # echo "Checking if image exists in ECR for major_version: $major_version"
     image_exists=$(docker manifest inspect $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPO_ECR_NAME:$major_version 2>&1)
 
-    # echo "Image exists: $image_exists"
+    echo "Image exists: $image_exists"
     
     if [[ $image_exists == *"no such manifest"* ]]; then
         echo "false"

@@ -37,19 +37,31 @@ get_full_version() {
 #     fi
 # }
 
+# image_exists_in_ecr() {
+#     major_version=$1
+#     # echo "Checking if image exists in ECR for major_version: $major_version"
+    
+#     # Utilizando la AWS CLI para verificar si la imagen existe en el repositorio ECR
+#     aws ecr describe-images --repository-name $REPO_ECR_NAME --image-ids imageTag=$major_version >/dev/null 2>&1
+    
+#     if [[ $? -eq 0 ]]; then
+#         echo "true"
+#     else
+#         echo "false"
+#     fi
+# }
+
 image_exists_in_ecr() {
     major_version=$1
-    # echo "Checking if image exists in ECR for major_version: $major_version"
-    
-    # Utilizando la AWS CLI para verificar si la imagen existe en el repositorio ECR
     aws ecr describe-images --repository-name $REPO_ECR_NAME --image-ids imageTag=$major_version >/dev/null 2>&1
     
     if [[ $? -eq 0 ]]; then
-        echo "true"
+        return 0  # Equivalente a "true"
     else
-        echo "false"
+        return 1  # Equivalente a "false"
     fi
 }
+
 
 IFS=',' read -ra VERSION_ARRAY <<< "$BLENDER_VERSIONS"
 
@@ -59,10 +71,10 @@ for VERSION in "${VERSION_ARRAY[@]}"; do
     echo "Building docker image for Blender version: $full_version with major version: $major_version"
     exists=$(image_exists_in_ecr $major_version)
     echo "Image exists in ECR: $exists"
-    if [[ $exists == "false" ]]; then
-        echo "Image does not exist in ECR"
+    if [[ $? -eq 0 ]]; then
+        echo "Image exists in ECR"
     else
-        echo "Docker image for Blender version: $full_version already exists in ECR"
+        echo "Image does not exist in ECR"
     fi
 
 done

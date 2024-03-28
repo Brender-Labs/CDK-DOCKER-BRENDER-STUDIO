@@ -58,12 +58,7 @@ for VERSION in "${VERSION_ARRAY[@]}"; do
     full_version=$(get_full_version $VERSION)
     echo "Building docker image for Blender version: $full_version with major version: $major_version"
     exists=$(image_exists_in_ecr $major_version)
-    echo "Image exists in ECR: $exists $?"
-    # if [[ $exists == "false" ]]; then
-    #     echo "Image does not exist in ECR"
-    # else
-    #     echo "Docker image for Blender version: $full_version already exists in ECR"
-    # fi
+    # echo "Image exists in ECR: $exists $?"
     if [[ $? -eq 0 ]]; then
         echo "Image exists in ECR"
     else

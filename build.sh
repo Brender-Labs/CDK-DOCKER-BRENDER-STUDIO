@@ -1,1 +1,0 @@
-# TODO: Build doker images from array of Blender versions

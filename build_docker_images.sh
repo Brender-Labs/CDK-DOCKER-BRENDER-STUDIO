@@ -39,7 +39,7 @@ get_full_version() {
 
 image_exists_in_ecr() {
     major_version=$1
-    echo "Checking if image exists in ECR for major_version: $major_version"
+    # echo "Checking if image exists in ECR for major_version: $major_version"
     
     # Utilizando la AWS CLI para verificar si la imagen existe en el repositorio ECR
     aws ecr describe-images --repository-name $REPO_ECR_NAME --image-ids imageTag=$major_version >/dev/null 2>&1

@@ -23,19 +23,19 @@ get_full_version() {
     echo "$full_version"
 }
 
-# image_exists_in_ecr() {
-#     major_version=$1
-#     echo "Checking if image exists in ECR for major_version: $major_version"
-#     image_exists=$(docker manifest inspect $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPO_ECR_NAME:$major_version 2>&1)
+image_exists_in_ecr() {
+    major_version=$1
+    # echo "Checking if image exists in ECR for major_version: $major_version"
+    image_exists=$(docker manifest inspect $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPO_ECR_NAME:$major_version 2>&1)
 
-#     echo "Image exists: $image_exists"
+    # echo "Image exists: $image_exists"
     
-#     if [[ $image_exists == *"no such manifest"* ]]; then
-#         echo "false"
-#     else
-#         echo "true"
-#     fi
-# }
+    if [[ $image_exists == *"no such manifest"* ]]; then
+        echo "false"
+    else
+        echo "true"
+    fi
+}
 
 # image_exists_in_ecr() {
 #     major_version=$1
@@ -51,18 +51,6 @@ get_full_version() {
 #     fi
 # }
 
-image_exists_in_ecr() {
-    major_version=$1
-    aws ecr describe-images --repository-name $REPO_ECR_NAME --image-ids imageTag=$major_version >/dev/null 2>&1
-    
-    if [[ $? -eq 0 ]]; then
-        return 0  # Equivalente a "true"
-    else
-        return 1  # Equivalente a "false"
-    fi
-}
-
-
 IFS=',' read -ra VERSION_ARRAY <<< "$BLENDER_VERSIONS"
 
 for VERSION in "${VERSION_ARRAY[@]}"; do 
@@ -71,10 +59,10 @@ for VERSION in "${VERSION_ARRAY[@]}"; do
     echo "Building docker image for Blender version: $full_version with major version: $major_version"
     exists=$(image_exists_in_ecr $major_version)
     echo "Image exists in ECR: $exists"
-    if [[ $? -eq 0 ]]; then
-        echo "Image exists in ECR"
-    else
+    if [[ $exists == "false" ]]; then
         echo "Image does not exist in ECR"
+    else
+        echo "Docker image for Blender version: $full_version already exists in ECR"
     fi
 
 done

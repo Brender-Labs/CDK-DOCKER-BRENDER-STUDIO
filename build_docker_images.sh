@@ -23,21 +23,33 @@ get_full_version() {
     echo "$full_version"
 }
 
+# image_exists_in_ecr() {
+#     major_version=$1
+#     echo "Checking if image exists in ECR for major_version: $major_version"
+#     image_exists=$(docker manifest inspect $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPO_ECR_NAME:$major_version 2>&1)
+
+#     echo "Image exists: $image_exists"
+    
+#     if [[ $image_exists == *"no such manifest"* ]]; then
+#         echo "false"
+#     else
+#         echo "true"
+#     fi
+# }
+
 image_exists_in_ecr() {
     major_version=$1
     echo "Checking if image exists in ECR for major_version: $major_version"
-    image_exists=$(docker manifest inspect $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPO_ECR_NAME:$major_version 2>&1)
-
-    echo "Image exists: $image_exists"
     
-    if [[ $image_exists == *"no such manifest"* ]]; then
-        echo "false"
-    else
+    # Utilizando la AWS CLI para verificar si la imagen existe en el repositorio ECR
+    aws ecr describe-images --repository-name $REPO_ECR_NAME --image-ids imageTag=$major_version >/dev/null 2>&1
+    
+    if [[ $? -eq 0 ]]; then
         echo "true"
+    else
+        echo "false"
     fi
 }
-
-
 
 IFS=',' read -ra VERSION_ARRAY <<< "$BLENDER_VERSIONS"
 

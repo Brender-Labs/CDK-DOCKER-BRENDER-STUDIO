@@ -35,11 +35,11 @@ export class BrenderStudioStack extends cdk.Stack {
 
     const brenderBucketName = 'brender-bucket-s3-' + uuidv4();
 
-    // cdk deploy --context stackName=BRENDER-STACK-TEST --parameters ecrImageName=brender-repo-ecr --context blenderVersions="GPU-4.0.0,CPU-4.0.0,CPU-3.6.0" --context brenderBucketName=brender-david-studio-test
-    // cdk deploy --context stackName=BRENDER-STACK-TEST-TAG-3 --parameters ecrImageName=brender-repo-ecr --context blenderVersions="GPU-4.0.0,CPU-4.0.0,CPU-3.6.0"  --context isPrivate="false"
-    // cdk destroy --context stackName=BRENDER-STACK-TEST-TAG-3 --context blenderVersions="GPU-4.0.0,CPU-4.0.0,CPU-3.6.0"  --context isPrivate="false"
+    // NEW VERSION
+    // cdk deploy --context stackName=BRENDER-STACK-TEST --parameters ecrImageName=brender-repo-ecr --context blenderVersions="3.0.0,3.6.0,4.0.0" --context isPrivate="false" --region us-east-1
 
-
+    // CDK Synth COMMAND
+    // cdk synth --context stackName=BRENDER-STACK-TEST --parameters ecrImageName=brender-repo-ecr --context blenderVersions="3.0.0,3.6.0,4.0.0" --context isPrivate="false" --region us-east-1
 
     const vpc = createVpc(this, {
       name: 'Vpc-' + uuidv4(),

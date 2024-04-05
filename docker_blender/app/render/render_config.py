@@ -8,6 +8,7 @@ from render_utils.environment.build_sys_args_by_render_type import build_sys_arg
 
 blender_file_path = os.environ['EFS_BLENDER_FILE_PATH']
 output_path = os.environ['EFS_BLENDER_OUTPUT_FOLDER_PATH']
+blender_executable_path = os.environ['BLENDER_EXECUTABLE']
 
 """
 Aqui obtenemos la configuracion de renderizado de la escena por sys args.
@@ -40,7 +41,8 @@ custom_script = '/app/render/render_background.py'
 # Correr Blender en background con el comando de renderizado
 
 blender_command = [
-    'blender',
+    # 'blender',
+    blender_executable_path,
     '-b',
     blender_file_path,
     '-P',

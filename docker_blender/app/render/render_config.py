@@ -55,5 +55,5 @@ print("Blender command:", blender_command)
 
 
 # Correr el comando de renderizado
-# os.system(blender_command)
+# os.system(' '.join(blender_command))
 subprocess.run(blender_command)

@@ -31,11 +31,11 @@ RUN apt-get update -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Download and install Blender
+
 RUN curl "${BLENDER_URL}" -o "blender.tar.xz" && \
-    tar -xvf blender.tar.xz --strip-components=1 -C /usr/bin && \
+    tar -xvf blender.tar.xz --strip-components=1 -C /bin && \
     rm -rf blender.tar.xz && \
-    rm -rf /usr/bin/blender
+    rm -rf blender
 
 RUN pip3 install boto3 requests
 

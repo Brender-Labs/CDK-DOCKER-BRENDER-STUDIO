@@ -44,7 +44,7 @@ def main():
 
         # Clean /mnt/projects/project_name folder
         try:
-            shutil.rmtree(os.path.join(efs_path, bucket_key))
+            # shutil.rmtree(os.path.join(efs_path, bucket_key))
             print("EFS folder cleaned up")
         except FileNotFoundError:
             print("Error: EFS folder not found")

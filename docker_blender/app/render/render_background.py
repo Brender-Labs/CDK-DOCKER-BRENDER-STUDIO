@@ -16,17 +16,17 @@ def main():
     argv = sys.argv
     argv = argv[argv.index("--") + 1:]
 
-    print("argv:", argv)
+    # print("argv:", argv)
 
     bpy.app.driver_namespace['argv'] = argv
     
 
     args: Namespace = parser.parse_args(bpy.app.driver_namespace['argv'])
 
-    for arg in vars(args):
-        value = getattr(args, arg)
-        if value:
-            print(f"{arg.replace('_', ' ').capitalize()}: {value}")
+    # for arg in vars(args):
+    #     value = getattr(args, arg)
+    #     if value:
+    #         print(f"{arg.replace('_', ' ').capitalize()}: {value}")
 
     # Controlar primero si usa GPU, si es asi llamar a la funcion para activar el uso de GPU (CUDA)
     if args.use_gpu == True:
@@ -73,6 +73,7 @@ def main():
     # Aqui debemos setear los datos de la escena comunmente usados en el renderizado
     # solo debe entrar si is_render_auto es False
     if args.is_render_auto == False: 
+        print("Entrando a configurar datos de la escena para renderizado manual")
         if args.scene_name:
             print("scene_name:", args.scene_name)
             set_scene_name(args.scene_name)

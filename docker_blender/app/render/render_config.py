@@ -27,14 +27,14 @@ if len(sys.argv) > 2:
     sys.exit(1)
 
 json_blender_render = parse_json(render_json_str)
-print("Parsed JSON:", json_blender_render)
+# print("Parsed JSON:", json_blender_render)
 
 # Llamar a la funcion que configura el display virtual
 configure_virtual_display(json_blender_render)
 
 # Llamar a la funcion que construye los sys args segun el tipo de renderizado
 sys_args = build_sys_args_by_render_type(json_blender_render)
-print("Sys args:", sys_args)
+# print("Sys args:", sys_args)
 
 custom_script = '/app/render/render_background.py'
 

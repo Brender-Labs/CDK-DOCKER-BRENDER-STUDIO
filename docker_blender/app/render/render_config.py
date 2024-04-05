@@ -19,6 +19,21 @@ Aqui obtenemos la configuracion de renderizado de la escena por sys args.
 4. Creamos el comando de renderizado con las caracteristicas obtenidas. Corremos Blender en background con el comando de renderizado (sys args customizados).
 """
 
+# REVISAR SI funciona el listado de archivos en EFS
+def list_efs_contents(directory):
+    """
+    List and print all contents of a directory recursively.
+    
+    Args:
+    directory (str): The directory path to list contents from.
+    """
+    print(f"Contents of {directory}:")
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            print(os.path.join(root, file))
+
+list_efs_contents('/mnt/efs')
+
 # Parse JSON 
 render_json_str = sys.argv[1]
 

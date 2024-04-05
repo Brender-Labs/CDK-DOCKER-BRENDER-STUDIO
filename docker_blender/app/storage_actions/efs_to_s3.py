@@ -22,7 +22,9 @@ def main():
         bucket_name = os.environ['BUCKET_NAME']
         bucket_key = os.environ['BUCKET_KEY']
         efs_path = os.environ['EFS_BLENDER_FOLDER_PATH']
+        print(f"EFS path: {efs_path}")
         render_output_path = os.path.join(efs_path, bucket_key, 'output')
+        print(f"Render output path: {render_output_path}")
 
         print("Cleaning up EFS folder")
 

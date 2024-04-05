@@ -41,14 +41,14 @@ RUN pip3 install boto3 requests
 
 # EFS ENV
 ENV EFS_BLENDER_FOLDER_PATH=/mnt/efs/projects
-ENV EFS_BLENDER_OUTPUT_FOLDER_PATH=/mnt/efs/projects/3.0/output
-ENV EFS_BLENDER_FILE_PATH=/mnt/efs/projects/3.0/3_0_scene.blend
+# ENV EFS_BLENDER_OUTPUT_FOLDER_PATH=/mnt/efs/projects/3.0/output
+# ENV EFS_BLENDER_FILE_PATH=/mnt/efs/projects/3.0/3_0_scene.blend
 
 # Blender ENV
 ENV BLENDER_EXECUTABLE=/usr/bin/blender
 
 # Job Action type
-ENV JOB_ACTION_TYPE=render
+# ENV JOB_ACTION_TYPE=render
 
 # Copy specific folders and their contents
 COPY ./app /app

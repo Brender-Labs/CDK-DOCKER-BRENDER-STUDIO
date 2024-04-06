@@ -52,7 +52,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         minvCpus: 0,
         maxvCpus: 256,
         enabled: true,
-        instanceTypes: [new InstanceType('c5'), new InstanceType('g5')]
+        instanceTypes: [new InstanceType('c5')]
     })
 
 
@@ -192,8 +192,9 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
             jobDefinitionName: jobDefinitionName,
             container: new EcsEc2ContainerDefinition(scope, containerDefinitionName, {
                 image: ContainerImage.fromEcrRepository(ecrRepository, version),
-                memory: cdk.Size.mebibytes(2048),
-                cpu: 1, 
+                // Add max memory for the container
+                memory: cdk.Size.gibibytes(192),
+                cpu: 256,
                 volumes: [EcsVolume.efs({
                     name: 'efs-volume',
                     fileSystem: efs,

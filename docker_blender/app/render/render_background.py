@@ -43,7 +43,7 @@ def main():
     else:
         print("use_compositor:", args.use_compositor)
         print("Not using compositor")
-        bpy.context.scene.use_compositing = False
+        bpy.context.scene.render.use_compositing = False
 
     # Controlar si se debe agregar metadata al renderizado
     if args.use_stamp_metadata == True:

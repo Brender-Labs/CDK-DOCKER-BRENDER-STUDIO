@@ -39,12 +39,11 @@ def main():
                 local_path = os.path.join(root, file)
                 s3_path = os.path.join(bucket_key, 'output', os.path.relpath(local_path, render_output_path))
                 upload_to_s3(local_path, bucket_name, s3_path, s3)
-
-        print("Render output uploaded to S3")
+                print("Render output uploaded to S3")
 
         # Clean /mnt/projects/project_name folder
         try:
-            # shutil.rmtree(os.path.join(efs_path, bucket_key))
+            shutil.rmtree(os.path.join(efs_path, bucket_key))
             print("EFS folder cleaned up")
         except FileNotFoundError:
             print("Error: EFS folder not found")

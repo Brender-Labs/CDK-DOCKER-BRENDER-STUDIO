@@ -193,8 +193,8 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
             container: new EcsEc2ContainerDefinition(scope, containerDefinitionName, {
                 image: ContainerImage.fromEcrRepository(ecrRepository, version),
                 // Add max memory for the container
-                memory: cdk.Size.gibibytes(192),
-                cpu: 256,
+                memory: cdk.Size.gibibytes(192), 
+                cpu: 256, // review this value 
                 volumes: [EcsVolume.efs({
                     name: 'efs-volume',
                     fileSystem: efs,

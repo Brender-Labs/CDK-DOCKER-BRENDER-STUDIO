@@ -54,8 +54,14 @@ try:
             except tarfile.ReadError:
                 # Si hay errores al abrir el archivo, mostrar un mensaje de error
                 print(f"Error: {obj_key} is not a valid tar.gz file")
+        elif obj_key.endswith('.blend'):
+            # Si el archivo es un .blend, copiarlo directamente
+            print(f"{obj_key} is a .blend file, copying directly")
+            os.rename(dest_path, os.path.join(extract_path, os.path.basename(dest_path)))
+            print(f"{obj_key} copied to {extract_path}")
         else:
-            print(f"{obj_key} is not a .tar.gz file, copying directly")
+            print(f"{obj_key} is not a .tar.gz or .blend file, ignoring")
+       
 
     print(f"Project folder copied to {efs_path}")
 except Exception as e:

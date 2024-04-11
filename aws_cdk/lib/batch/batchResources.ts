@@ -40,10 +40,6 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         console.log(`Subnet ${subnet.subnetId} en la zona de disponibilidad ${subnet.availabilityZone}`);
     });
 
-    console.log('allSubnets: ', allSubnets)
-
-    // print private subnets type from allSubnets
-
     // =================COMPUTE ENVIRONMENTS CPU=================
 
     const computeEnvOnDemandCPU = new ManagedEc2EcsComputeEnvironment(scope, 'ComputeEnvOnDemandCPU-' + uuidv4(), {
@@ -83,9 +79,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         }),
         vpc,
         vpcSubnets: {
-            // subnetType: isPrivate ? SubnetType.PRIVATE_WITH_EGRESS : SubnetType.PUBLIC,
             subnets: allSubnets,
-            availabilityZones: allSubnets.map(subnet => subnet.availabilityZone),
         },
         instanceTypes: [
             new InstanceType('optimal')
@@ -114,7 +108,6 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         }),
         vpc,
         vpcSubnets: {
-            // subnetType: isPrivate ? SubnetType.PRIVATE_WITH_EGRESS : SubnetType.PUBLIC,
             subnets: allSubnets,
         },
         instanceTypes: [
@@ -139,7 +132,6 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         }),
         vpc,
         vpcSubnets: {
-            // subnetType: isPrivate ? SubnetType.PRIVATE_WITH_EGRESS : SubnetType.PUBLIC,
             subnets: allSubnets,
         },
         instanceTypes: [
@@ -207,8 +199,8 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         console.log('jobDefinitionName: ', jobDefinitionName);
 
         new EcsJobDefinition(scope, jobDefinitionName, {
-            timeout: cdk.Duration.minutes(1),
-            retryAttempts: 1,
+            timeout: cdk.Duration.minutes(60),
+            retryAttempts: 3,
             jobDefinitionName: jobDefinitionName,
             container: new EcsEc2ContainerDefinition(scope, containerDefinitionName, {
                 image: ContainerImage.fromEcrRepository(ecrRepository, version),

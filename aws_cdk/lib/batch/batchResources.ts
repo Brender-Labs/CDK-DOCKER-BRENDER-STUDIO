@@ -31,11 +31,20 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
 
     const s3Policy = createS3Policy(scope, { s3BucketName })
 
+    // obtener todas las subnets de la vpc
+    const allSubnets = vpc.selectSubnets({
+        subnetType: isPrivate ? SubnetType.PRIVATE_WITH_EGRESS : SubnetType.PUBLIC
+    }).subnets;
+
+    allSubnets.forEach(subnet => {
+        console.log(`Subnet ${subnet.subnetId} en la zona de disponibilidad ${subnet.availabilityZone}`);
+    });
 
     // =================COMPUTE ENVIRONMENTS CPU=================
 
     const computeEnvOnDemandCPU = new ManagedEc2EcsComputeEnvironment(scope, 'ComputeEnvOnDemandCPU-' + uuidv4(), {
         useOptimalInstanceClasses: true,
+
         instanceRole: new Role(scope, 'ComputeEnvironmentRoleOnDemandCPU', {
             assumedBy: new ServicePrincipal('ec2.amazonaws.com'),
             managedPolicies: [
@@ -44,8 +53,10 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
             ],
         }),
         vpc,
+        // all az subnets 
         vpcSubnets: {
-            subnetType: isPrivate ? SubnetType.PRIVATE_WITH_EGRESS : SubnetType.PUBLIC,
+            // subnetType: isPrivate ? SubnetType.PRIVATE_WITH_EGRESS : SubnetType.PUBLIC,
+            subnets: allSubnets,
         },
         computeEnvironmentName: 'ComputeEnvOnDemandCPU-' + uuidv4(),
         securityGroups: [sg],
@@ -54,6 +65,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         enabled: true,
         instanceTypes: [new InstanceType('c5')]
     })
+
 
 
     const computeEnvSpotCPU = new ManagedEc2EcsComputeEnvironment(scope, 'ComputeEnvSpotCPU-' + uuidv4(), {
@@ -67,7 +79,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         }),
         vpc,
         vpcSubnets: {
-            subnetType: isPrivate ? SubnetType.PRIVATE_WITH_EGRESS : SubnetType.PUBLIC,
+            subnets: allSubnets,
         },
         instanceTypes: [
             new InstanceType('optimal')
@@ -96,7 +108,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         }),
         vpc,
         vpcSubnets: {
-            subnetType: isPrivate ? SubnetType.PRIVATE_WITH_EGRESS : SubnetType.PUBLIC,
+            subnets: allSubnets,
         },
         instanceTypes: [
             new InstanceType('g5')
@@ -120,7 +132,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         }),
         vpc,
         vpcSubnets: {
-            subnetType: isPrivate ? SubnetType.PRIVATE_WITH_EGRESS : SubnetType.PUBLIC,
+            subnets: allSubnets,
         },
         instanceTypes: [
             new InstanceType('g5')
@@ -187,13 +199,13 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         console.log('jobDefinitionName: ', jobDefinitionName);
 
         new EcsJobDefinition(scope, jobDefinitionName, {
-            timeout: cdk.Duration.minutes(1),
-            retryAttempts: 1,
+            timeout: cdk.Duration.minutes(60),
+            retryAttempts: 3,
             jobDefinitionName: jobDefinitionName,
             container: new EcsEc2ContainerDefinition(scope, containerDefinitionName, {
                 image: ContainerImage.fromEcrRepository(ecrRepository, version),
                 // Add max memory for the container
-                memory: cdk.Size.gibibytes(192), 
+                memory: cdk.Size.gibibytes(192),
                 cpu: 256, // review this value 
                 volumes: [EcsVolume.efs({
                     name: 'efs-volume',

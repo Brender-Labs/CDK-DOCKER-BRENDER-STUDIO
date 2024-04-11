@@ -15,6 +15,7 @@ export function createVpc(scope: Construct, props: VpcProps): IVpc {
     if (!isPrivate) {
         const vpc = new Vpc(scope, name, {
             natGateways: 0,
+            maxAzs: 99,
             subnetConfiguration: [
                 {
                     cidrMask: 24,
@@ -23,7 +24,17 @@ export function createVpc(scope: Construct, props: VpcProps): IVpc {
                 },
                 {
                     cidrMask: 24,
+                    name: 'public-subnet-2',
+                    subnetType: SubnetType.PUBLIC,
+                },
+                {
+                    cidrMask: 24,
                     name: 'private-subnet-1',
+                    subnetType: SubnetType.PRIVATE_WITH_EGRESS,
+                },
+                {
+                    cidrMask: 24,
+                    name: 'private-subnet-2',
                     subnetType: SubnetType.PRIVATE_WITH_EGRESS,
                 }
             ],

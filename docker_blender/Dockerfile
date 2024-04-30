@@ -1,6 +1,10 @@
 # FROM public.ecr.aws/docker/library/ubuntu:22.04
 FROM public.ecr.aws/genophore/nvidia/cuda:12.3.1-runtime-ubuntu22.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+RUN echo 'tzdata tzdata/Areas select Etc' | debconf-set-selections
+RUN echo 'tzdata tzdata/Zones/Etc select UTC' | debconf-set-selections
+
 ARG BLENDER_VERSION=${BLENDER_VERSION}
 ARG BLENDER_VERSION_MAJOR=${BLENDER_VERSION_MAJOR}
 ENV BLENDER_URL https://mirror.clarkson.edu/blender/release/Blender${BLENDER_VERSION}/blender-${BLENDER_VERSION_MAJOR}-linux-x64.tar.xz
@@ -15,6 +19,8 @@ RUN apt-get update -y && \
     xz-utils \
     python3 \
     python3-pip \
+    python3-pil \
+    python3-pil.imagetk \
     xvfb \
     libnvidia-gl-515 \
     tree \

@@ -43,7 +43,8 @@ def get_batch_job_2_details(job_id, region):
         minutes = (runtime_timedelta.seconds % 3600) // 60
         seconds = runtime_timedelta.seconds % 60
 
-        runtime_formatted = "{:02}:{:02}:{:02}".format(hours, minutes, seconds)
+        # Formatear el tiempo de ejecución como HH:MM:SS
+        runtime_formatted = "{:02}:{:02}:{:02}".format(str(hours), str(minutes), str(seconds))
 
         return runtime_formatted
     

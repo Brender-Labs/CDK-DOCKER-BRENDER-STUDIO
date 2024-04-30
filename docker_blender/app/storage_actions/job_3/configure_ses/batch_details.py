@@ -1,5 +1,5 @@
 import boto3
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 def get_batch_job_2_details(job_id, region):
     try:
@@ -30,21 +30,20 @@ def get_batch_job_2_details(job_id, region):
         start_time_seconds = start_time_ms / 1000
         end_time_seconds = end_time_ms / 1000
 
-        # Convertir a objetos datetime
-        start_datetime = datetime.utcfromtimestamp(start_time_seconds)
-        end_datetime = datetime.utcfromtimestamp(end_time_seconds)
+        # Convertir a objetos datetime en UTC
+        start_datetime = datetime.fromtimestamp(start_time_seconds, tz=timezone.utc)
+        end_datetime = datetime.fromtimestamp(end_time_seconds, tz=timezone.utc)
 
         # Calcular tiempo de ejecución
         runtime_seconds = (end_datetime - start_datetime).total_seconds()
         runtime_timedelta = timedelta(seconds=runtime_seconds)
 
         # Obtener horas, minutos y segundos
-        hours = runtime_timedelta.seconds // 3600
-        minutes = (runtime_timedelta.seconds % 3600) // 60
-        seconds = runtime_timedelta.seconds % 60
+        hours, remainder = divmod(runtime_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
 
         # Formatear el tiempo de ejecución como HH:MM:SS
-        runtime_formatted = "{:02}:{:02}:{:02}".format(str(hours), str(minutes), str(seconds))
+        runtime_formatted = "{:02}:{:02}:{:02}".format(int(hours), int(minutes), int(seconds))
 
         return runtime_formatted
     

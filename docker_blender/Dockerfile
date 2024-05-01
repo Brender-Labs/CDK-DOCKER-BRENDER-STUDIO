@@ -17,6 +17,7 @@ RUN apt-get update -y && \
     ca-certificates \
     zip \
     xz-utils \
+    imagemagick \
     python3 \
     python3-pip \
     python3-pil \
@@ -43,7 +44,7 @@ RUN curl "${BLENDER_URL}" -o "blender.tar.xz" && \
     rm -rf blender.tar.xz && \
     rm -rf blender
 
-RUN pip3 install boto3 requests
+RUN pip3 install boto3 requests Wand
 
 # EFS ENV
 ENV EFS_BLENDER_FOLDER_PATH=/mnt/efs/projects

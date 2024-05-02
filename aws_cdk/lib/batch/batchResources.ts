@@ -8,6 +8,7 @@ import { ManagedPolicy, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { createS3Policy } from '../iam-roles/s3/createS3Policy';
 import { v4 as uuidv4 } from 'uuid';
+import { createBatchPolicy } from '../iam-roles/batch/createBatchPolicy';
 
 
 
@@ -30,6 +31,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
 
 
     const s3Policy = createS3Policy(scope, { s3BucketName })
+    const batchPolicy = createBatchPolicy(scope);
 
     // obtener todas las subnets de la vpc
     const allSubnets = vpc.selectSubnets({
@@ -50,6 +52,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
             managedPolicies: [
                 ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonEC2ContainerServiceforEC2Role'),
                 s3Policy,
+                batchPolicy,
             ],
         }),
         vpc,
@@ -75,6 +78,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
             managedPolicies: [
                 ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonEC2ContainerServiceforEC2Role'),
                 s3Policy,
+                batchPolicy,
             ],
         }),
         vpc,
@@ -104,6 +108,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
             managedPolicies: [
                 ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonEC2ContainerServiceforEC2Role'),
                 s3Policy,
+                batchPolicy,
             ],
         }),
         vpc,
@@ -128,6 +133,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
             managedPolicies: [
                 ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonEC2ContainerServiceforEC2Role'),
                 s3Policy,
+                batchPolicy,
             ],
         }),
         vpc,

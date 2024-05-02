@@ -16,6 +16,26 @@ def convert_bytes_to_gb(bytes_size):
     gb_size = bytes_size / (1024 * 1024 * 1024)
     return gb_size
 
+def format_expiration_date(expiration_date):
+    # Convertir la cadena de fecha a un objeto datetime
+    expiration_date_obj = datetime.strptime(expiration_date, "%Y-%m-%d")
+    
+    # Definir los nombres de los meses en inglés
+    months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ]
+    
+    # Obtener el día, mes y año de la fecha de vencimiento
+    day = expiration_date_obj.day
+    month = months[expiration_date_obj.month - 1]
+    year = expiration_date_obj.year
+    
+    # Formatear la fecha en el formato deseado
+    formatted_date = f"{day} {month}, {year}"
+    
+    return formatted_date
+
 def send_render_ok_email(thumbnail_presigned_url, output_zip_presigned_url, ses_config, render_details, zip_size, runtime_minutes):
     """
     Send an email with the specified SES configuration and render details
@@ -57,7 +77,7 @@ def send_render_ok_email(thumbnail_presigned_url, output_zip_presigned_url, ses_
             'rendering_time': runtime_minutes,
             'object_size': object_size_str,
             'current_year': str(datetime.now().year),
-            'expiration_time': (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')  # 7 days from now 
+            'expiration_time': format_expiration_date((datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d'))  # 7 days from now 
         }
 
         # Enviar el correo electrónico utilizando la plantilla

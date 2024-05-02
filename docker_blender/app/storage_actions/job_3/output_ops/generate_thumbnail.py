@@ -22,7 +22,7 @@ def generate_thumbnail(render_output_path, thumbnail_output_path):
     image_path = None
     for root, dirs, files in os.walk(render_output_path):
         for file in files:
-            if file.endswith(('.bmp', '.iris', '.png', '.jpg', '.jpeg', '.jp2', '.tga', '.dpx', '.exr', '.hdr', '.tif', 'tiff', '.webp')):
+            if file.endswith(('.bmp', '.iris', '.png', '.jpg', '.jpeg', '.jp2', '.tga', '.dpx', '.exr', '.hdr', '.tif', 'tiff', '.webp', '.cin')):
                 image_path = os.path.join(root, file)
                 break
         if image_path:
@@ -32,11 +32,13 @@ def generate_thumbnail(render_output_path, thumbnail_output_path):
 
     # Abrir la imagen y crear el thumbnail
     try:
-        if image_path.lower().endswith(('.bmp', '.iris', '.jpg', '.jpeg', '.jp2', '.tga', '.dpx', '.exr', '.hdr', '.tif', 'tiff', '.webp')):
+        if image_path.lower().endswith(('.bmp', '.iris', '.jpg', '.jpeg', '.jp2', '.tga', '.dpx', '.exr', '.hdr', '.tif', 'tiff', '.webp', '.cin')):
             # Convertir a PNG utilizando ImageMagick (wand)
             png_path = convert_to_png(image_path)
             # Abrir la imagen convertida
             image = Image.open(png_path)
+            # Eliminar la imagen convertida
+            os.remove(png_path) 
         else:
             image = Image.open(image_path)
     except Exception as e:
@@ -49,7 +51,7 @@ def generate_thumbnail(render_output_path, thumbnail_output_path):
 
     # Redimensionar la imagen con las nuevas dimensiones
     thumbnail = image.resize((new_width, new_height))
-    # thumbnail_path = os.path.join(os.path.dirname(image_path), 'thumbnail.png')
+    # Guardar el thumbnail
     thumbnail_path = os.path.join(thumbnail_output_path, '_thumbnail.png')
     thumbnail.save(thumbnail_path)
     print(f"Thumbnail created: {thumbnail_path}")

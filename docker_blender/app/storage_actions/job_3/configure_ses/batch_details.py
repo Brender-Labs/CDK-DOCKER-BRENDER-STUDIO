@@ -19,12 +19,19 @@ def get_batch_job_2_details(job_id, region):
         print(f"Job info: {job_info}")
 
         # Verificar si se proporcionaron las claves necesarias
-        if 'startedAt' not in job_info or 'stoppedAt' not in job_info:
+        if 'startedAt' in job_info and 'stoppedAt' in job_info:
+            # Si se proporciona el tiempo de inicio y finalización, calcular el tiempo de ejecución normalmente
+            start_time_ms = job_info['startedAt']
+            end_time_ms = job_info['stoppedAt']
+        elif 'createdAt' in job_info:
+            # Si no se proporciona el tiempo de inicio y finalización pero se proporciona createdAt,
+            # calcular el tiempo de ejecución utilizando el createdAt y la hora actual
+            created_at_ms = job_info['createdAt']
+            current_time_ms = datetime.now().timestamp() * 1000  # Obtener la hora actual en milisegundos
+            start_time_ms = created_at_ms
+            end_time_ms = current_time_ms
+        else:
             raise ValueError("La respuesta de AWS Batch no contiene la información necesaria")
-
-        # Extraer tiempo de inicio y finalización del trabajo
-        start_time_ms = job_info['startedAt']
-        end_time_ms = job_info['stoppedAt']
 
         # Convertir de milisegundos a segundos
         start_time_seconds = start_time_ms / 1000

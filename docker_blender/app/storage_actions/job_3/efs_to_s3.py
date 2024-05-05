@@ -6,8 +6,9 @@ from output_ops.output_to_zip import output_to_zip
 from output_ops.upload_s3 import upload_to_s3
 from configure_ses.presigned_urls import generate_presigned_urls
 from configure_ses.send_email import send_render_ok_email
+from configure_ses.send_email_error import send_render_error_email
 from clean_up.clean_project_efs import clean_up_project_folder_efs
-from configure_ses.batch_details import get_batch_job_2_details
+from configure_ses.batch_details import get_batch_job_info
 
 def main():
     try:
@@ -32,6 +33,13 @@ def main():
         json_ses = parse_json(ses_json_str)
         print("Parsed JSON SES:", json_ses)
 
+        ses_details = json_ses['ses']
+        ses_active = json_ses['ses']['ses_active']
+        ses_config = json_ses['ses']['ses_config']
+        render_details = json_ses['ses']['render_details']
+        region = ses_config['region']
+        job_id = ses_config['batch_job_2_id']
+
         # 1. Check if the specified EFS folder exists
         if not os.path.exists(render_output_path):
             raise FileNotFoundError(f"EFS folder not found: {render_output_path}")
@@ -53,12 +61,6 @@ def main():
         Parsed JSON SES: {'ses': {'ses_active': True, 'render_details': {'project_name': 'Project_5', 'resolution': '1920x1080', 'scene_name': 'Scene', 'layer_name': 'Layer1', 'camera_name': 'Camera1', 'samples': '200', 'engine': 'CYCLES', 'render_type': 'Still'}, 'ses_config': {'region': 'us-east-1', 'source_email': 'rejdev24@gmail.com', 'destination_email': 'rejdev24@gmail.com', 'render_ok_template_name': 'RenderCompletedTemplate', "batch_job_2_id": "45557eab-576d-41ff-a2ba-2c357ab5037e"}}}
         """
 
-        ses_active = json_ses['ses']['ses_active']
-        render_details = json_ses['ses']['render_details']
-        ses_config = json_ses['ses']['ses_config']
-        region = ses_config['region']
-        job_id = ses_config['batch_job_2_id']
-
         print(f"SES Active: {ses_active}")
         print(f"Render Details: {render_details}")
         print(f"SES Config: {ses_config}")
@@ -70,24 +72,48 @@ def main():
             print("SES is active, sending email")  
 
             # 5. Crear url presignada de thumbnail (para ses template) y de output.zip (para ses template)
-            thumbnail_presigned_url, output_zip_presigned_url = generate_presigned_urls(thumbnail_path, output_zip_path)
+            thumbnail_presigned_url, output_zip_presigned_url = generate_presigned_urls(region)
             print(f"Thumbnail presigned url: {thumbnail_presigned_url}")
             print(f"Output.zip presigned url: {output_zip_presigned_url}")
 
             # 6. Get aws batch job 2 details (ec2 type, instance type, vcpus, memory, and job start , end time, etc.)
-            runtime_minutes = get_batch_job_2_details(job_id, region)
+            runtime, status = get_batch_job_info(job_id, region)
 
-            print(f"Runtime minutes: {runtime_minutes}")
+            print(f"Runtime minutes: {runtime}")
             
             # 7. Ses logic to send email with the presigned urls (template with the urls)
-            response = send_render_ok_email(thumbnail_presigned_url, output_zip_presigned_url, ses_config, render_details, zip_size, runtime_minutes)
+            response = send_render_ok_email(thumbnail_presigned_url, output_zip_presigned_url, ses_config, render_details, zip_size, runtime)
             print(f"SES response: {response}")
 
 
         # 8. Clean up the EFS folder
         clean_up_project_folder_efs(efs_path, bucket_key)
 
-    
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        print("Sending error email to user")
+        runtime, status = get_batch_job_info(job_id, region)
+        print(f"Runtime: {runtime}")
+        print(f"Status: {status}")
+
+        statusReason = status['reason']
+        print(f"Status Reason: {statusReason}")
+        logStreamName = status['log_stream_name']
+        print(f"Log Stream Name: {logStreamName}")
+
+        # Clean up the EFS folder
+        clean_up_project_folder_efs(efs_path, bucket_key)
+
+        if not ses_active:
+            print("SES is not active, skipping email sending")
+            exit(0)
+        else:
+        # enviar email con error
+            response = send_render_error_email(ses_config, render_details, runtime, status)
+            print(f"SES response: {response}")
+
+        exit(1)
+
     except Exception as e:
         print(f"Error: {e}")
         exit(1)

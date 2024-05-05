@@ -1,5 +1,6 @@
 # FROM public.ecr.aws/docker/library/ubuntu:22.04
-FROM public.ecr.aws/genophore/nvidia/cuda:12.3.1-runtime-ubuntu22.04
+# FROM public.ecr.aws/genophore/nvidia/cuda:12.3.1-runtime-ubuntu22.04
+FROM public.ecr.aws/xapien/nvidia/cuda:12.4.1-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN echo 'tzdata tzdata/Areas select Etc' | debconf-set-selections

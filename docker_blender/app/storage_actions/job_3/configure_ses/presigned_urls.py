@@ -49,7 +49,8 @@ def generate_presigned_urls(region):
         # Asumir el rol para obtener credenciales temporales
         assumed_role = sts_client.assume_role(
             RoleArn=role_arn,
-            RoleSessionName='AssumedRoleSession'
+            RoleSessionName='AssumedRoleSession',
+            DurationSeconds=604800 # 1 semana
         )
 
         # Obtener las credenciales temporales

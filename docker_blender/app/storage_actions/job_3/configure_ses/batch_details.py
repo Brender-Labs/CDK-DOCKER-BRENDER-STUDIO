@@ -1,7 +1,7 @@
 import boto3
 from datetime import datetime, timedelta, timezone
 
-def get_batch_job_2_details(job_id, region):
+def get_batch_job_info(job_id, region):
     try:
         # Crear cliente de AWS Batch
         batch_client = boto3.client('batch', region_name=region)
@@ -16,44 +16,68 @@ def get_batch_job_2_details(job_id, region):
         # Extraer información sobre el trabajo de AWS Batch
         job_info = response['jobs'][0]
 
-        print(f"Job info: {job_info}")
+        # Inicializar variables para el tiempo de inicio y finalización
+        start_time_ms = None
+        end_time_ms = None
 
-        # Verificar si se proporcionaron las claves necesarias
+        # Verificar si se proporcionaron las claves necesarias para calcular el tiempo de ejecución
         if 'startedAt' in job_info and 'stoppedAt' in job_info:
-            # Si se proporciona el tiempo de inicio y finalización, calcular el tiempo de ejecución normalmente
             start_time_ms = job_info['startedAt']
             end_time_ms = job_info['stoppedAt']
         elif 'createdAt' in job_info:
-            # Si no se proporciona el tiempo de inicio y finalización pero se proporciona createdAt,
-            # calcular el tiempo de ejecución utilizando el createdAt y la hora actual
             created_at_ms = job_info['createdAt']
-            current_time_ms = datetime.now().timestamp() * 1000  # Obtener la hora actual en milisegundos
+            current_time_ms = datetime.now().timestamp() * 1000
             start_time_ms = created_at_ms
             end_time_ms = current_time_ms
         else:
             raise ValueError("La respuesta de AWS Batch no contiene la información necesaria")
 
-        # Convertir de milisegundos a segundos
-        start_time_seconds = start_time_ms / 1000
-        end_time_seconds = end_time_ms / 1000
+        # Calcular tiempo de ejecución si se proporcionaron los tiempos de inicio y finalización
+        if start_time_ms is not None and end_time_ms is not None:
+            runtime_formatted = calculate_runtime(start_time_ms, end_time_ms)
+        else:
+            runtime_formatted = "Tiempo de ejecución no disponible"
 
-        # Convertir a objetos datetime en UTC
-        start_datetime = datetime.fromtimestamp(start_time_seconds, tz=timezone.utc)
-        end_datetime = datetime.fromtimestamp(end_time_seconds, tz=timezone.utc)
+        # Obtener información de estado del trabajo
+        status_info = get_status_info(job_info)
 
-        # Calcular tiempo de ejecución
-        runtime_seconds = (end_datetime - start_datetime).total_seconds()
-        runtime_timedelta = timedelta(seconds=runtime_seconds)
-
-        # Obtener horas, minutos y segundos
-        hours, remainder = divmod(runtime_seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-
-        # Formatear el tiempo de ejecución como HH:MM:SS
-        runtime_formatted = "{:02}:{:02}:{:02}".format(int(hours), int(minutes), int(seconds))
-
-        return runtime_formatted
+        return runtime_formatted, status_info
     
     except Exception as e:
         print(f"Ocurrió un error al obtener detalles del trabajo: {e}")
+        return None, None
+
+def calculate_runtime(start_time_ms, end_time_ms):
+    # Convertir de milisegundos a segundos
+    start_time_seconds = start_time_ms / 1000
+    end_time_seconds = end_time_ms / 1000
+
+    # Convertir a objetos datetime en UTC
+    start_datetime = datetime.fromtimestamp(start_time_seconds, tz=timezone.utc)
+    end_datetime = datetime.fromtimestamp(end_time_seconds, tz=timezone.utc)
+
+    # Calcular tiempo de ejecución
+    runtime_seconds = (end_datetime - start_datetime).total_seconds()
+
+    # Obtener horas, minutos y segundos
+    hours, remainder = divmod(runtime_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    # Formatear el tiempo de ejecución como HH:MM:SS
+    runtime_formatted = "{:02}:{:02}:{:02}".format(int(hours), int(minutes), int(seconds))
+
+    return runtime_formatted
+
+def get_status_info(job_info):
+    try:
+        # Obtener información de estado del trabajo
+        reason = job_info['attempts'][0]['container']['reason']
+        log_stream_name = job_info['attempts'][0]['container']['logStreamName']
+        status_info = {
+            "reason": reason,
+            "log_stream_name": log_stream_name
+        }
+        return status_info
+    except Exception as e:
+        print(f"Ocurrió un error al obtener la información de estado del trabajo: {e}")
         return None

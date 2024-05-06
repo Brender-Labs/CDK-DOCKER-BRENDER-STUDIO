@@ -1,15 +1,19 @@
 import os
 import boto3
 from botocore.exceptions import ClientError
+from botocore.client import Config
+import boto3.session
 
 bucket_name = os.environ.get('BUCKET_NAME')
 bucket_key = os.environ.get('BUCKET_KEY')
 
 # review args if needed!!!
 
-def generate_presigned_urls(thumbnail_path, output_zip_path):
+def generate_presigned_urls(region):
     try:
-        s3_client = boto3.client('s3')
+        session = boto3.session.Session(region_name=region)
+        
+        s3_client = session.client('s3', config=Config(signature_version='s3v4'))
 
         # Generate presigned url for thumbnail
         thumbnail_presigned_url = s3_client.generate_presigned_url(

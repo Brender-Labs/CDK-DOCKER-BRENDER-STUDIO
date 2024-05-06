@@ -76,7 +76,15 @@ def get_status_info(job_info):
         status_info = {
             "reason": reason,
             "log_stream_name": log_stream_name
-        }
+        } 
+
+        # si no hay información de estado, devolver un mensaje predeterminado
+        if reason is None:
+            status_info['reason'] = "Information not available for this job."
+        if log_stream_name is None:
+            status_info['log_stream_name'] = "Name not available for this job."
+
+
         return status_info
     except Exception as e:
         print(f"Ocurrió un error al obtener la información de estado del trabajo: {e}")

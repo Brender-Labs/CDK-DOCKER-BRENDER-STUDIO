@@ -73,7 +73,7 @@ def generate_presigned_urls(region):
                 'Bucket': bucket_name,
                 'Key': f"{bucket_key}/bs_thumbnail.png"
             },
-            ExpiresIn=3600  # 1 hora
+            ExpiresIn=604800 # 1 semana
         )
 
         # Generar URL prefirmada para output.zip
@@ -83,7 +83,7 @@ def generate_presigned_urls(region):
                 'Bucket': bucket_name,
                 'Key': f"{bucket_key}/output.zip"
             },
-            ExpiresIn=3600  # 1 hora
+            ExpiresIn=604800 # 1 semana
         )
 
         return thumbnail_presigned_url, output_zip_presigned_url

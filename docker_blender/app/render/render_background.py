@@ -1,6 +1,7 @@
 from argparse import Namespace
 from render.render_utils.bpy_config import enable_gpus
 from render.render_utils.bpy_config.render_frame import render_still
+from render.render_utils.bpy_config.render_animation import render_animation
 from render.render_utils.bpy_config.arg_parser_scene import create_parser
 from render.render_utils.bpy_config.scene_configurator import set_scene_name, set_layer_name, set_camera, set_resolution, set_aspect_ratio, set_output_settings, configure_compositor_nodes
 from render.render_utils.bpy_config.set_scene_data_by_engine import set_cycles_config, set_eevee_config
@@ -67,7 +68,8 @@ def main():
         print("is_render_auto:", args.is_render_auto)
         print("Renderizando automaticamente animacion")
         # Llamar a una funcion para renderizar la animacion
-        render_still(args.active_frame)
+        render_animation(args.start_frame, args.end_frame, args.frame_step)
+
 
 
     # Aqui debemos setear los datos de la escena comunmente usados en el renderizado
@@ -120,8 +122,10 @@ def main():
                               args.max_bounces_transparent, 
                               args.max_bounces_volume, 
                               args.samples)
-            
-            render_still(args.active_frame)
+            if args.render_type == "frame":
+                render_still(args.active_frame)
+            elif args.render_type == "animation":
+                render_animation(args.start_frame, args.end_frame, args.frame_step)
             
         if args.engine == "BLENDER_EEVEE":
             print("engine:", args.engine)
@@ -132,7 +136,10 @@ def main():
                              args.high_bitdepth, 
                              args.soft_shadows)
 
-            render_still(args.active_frame)
+            if args.render_type == "frame":
+                render_still(args.active_frame)
+            elif args.render_type == "animation":
+                render_animation(args.start_frame, args.end_frame, args.frame_step)
 
 
         

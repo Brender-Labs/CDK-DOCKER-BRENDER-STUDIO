@@ -77,7 +77,7 @@ def main():
             print(f"Output.zip presigned url: {output_zip_presigned_url}")
 
             # 6. Get aws batch job 2 details (ec2 type, instance type, vcpus, memory, and job start , end time, etc.)
-            runtime, status = get_batch_job_info(job_id, region)
+            runtime, status = get_batch_job_info(job_id, region, render_details)
 
             print(f"Runtime minutes: {runtime}")
             
@@ -92,7 +92,7 @@ def main():
     except FileNotFoundError as e:
         print(f"Error: {e}")
         print("Sending error email to user")
-        runtime, status = get_batch_job_info(job_id, region)
+        runtime, status = get_batch_job_info(job_id, region, render_details)
         print(f"Runtime: {runtime}")
         print(f"Status: {status}")
 

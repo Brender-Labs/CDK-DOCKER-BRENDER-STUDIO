@@ -108,6 +108,7 @@ def build_sys_args_by_render_type(json_blender_render):
         aws_batch_array_size = int(os.environ['AWS_BATCH_JOB_ARRAY_SIZE'])
         print("Animation render type detected")
         start_frame = int(render_config['start_frame'])
+        end_frame = int(render_config['end_frame'])
         frame_step = int(render_config['frame_step'])
 
         # Llamar funcion para calcular el frame activo segun el array job de aws batch
@@ -117,6 +118,9 @@ def build_sys_args_by_render_type(json_blender_render):
         sys_args.extend([
             "-fps", str(render_config['fps']),
             "-active_frame", str(active_frame),
+            "-start_frame", str(start_frame),
+            "-end_frame", str(end_frame),
+            "-frame_step", str(frame_step),
         ])
 
         # Solo extender los sys args common si no es render auto

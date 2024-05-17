@@ -25,6 +25,9 @@ def create_parser():
     parser.add_argument("-use_compositor", help="Use compositor", required=False, type=str_to_bool)
     parser.add_argument("-use_sequencer", help="Use sequencer", required=False, type=str_to_bool)
     parser.add_argument("-use_stamp_metadata", help="Use stamp metadata", required=False, type=str_to_bool)
+    parser.add_argument("-start_frame", help="Start frame", required=False, type=int)
+    parser.add_argument("-end_frame", help="End frame", required=False, type=int)
+    parser.add_argument("-frame_step", help="Frame step", required=False, type=float)
     # render info
     parser.add_argument("-ar_h", "--aspect_ratio_height", help="Aspect ratio height", required=False, type=float)
     parser.add_argument("-ar_w", "--aspect_ratio_width", help="Aspect ratio width", required=False, type=float)

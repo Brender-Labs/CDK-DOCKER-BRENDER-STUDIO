@@ -16,25 +16,27 @@ def convert_bytes_to_gb(bytes_size):
     gb_size = bytes_size / (1024 * 1024 * 1024)
     return gb_size
 
-def format_expiration_date(expiration_date):
-    # Convertir la cadena de fecha a un objeto datetime
-    expiration_date_obj = datetime.strptime(expiration_date, "%Y-%m-%d")
-    
+def format_expiration_datetime(expiration_datetime):
+    """
+    Formatea la fecha y hora de expiración en el formato deseado
+    """
     # Definir los nombres de los meses en inglés
     months = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ]
     
-    # Obtener el día, mes y año de la fecha de vencimiento
-    day = expiration_date_obj.day
-    month = months[expiration_date_obj.month - 1]
-    year = expiration_date_obj.year
+    # Obtener el día, mes, año y hora de la fecha de expiración
+    day = expiration_datetime.day
+    month = months[expiration_datetime.month - 1]
+    year = expiration_datetime.year
+    hour = expiration_datetime.hour
+    minute = expiration_datetime.minute
     
-    # Formatear la fecha en el formato deseado
-    formatted_date = f"{day} {month}, {year}"
+    # Formatear la fecha y hora en el formato deseado
+    formatted_datetime = f"{day} {month}, {year} at {hour:02d}:{minute:02d}"
     
-    return formatted_date
+    return formatted_datetime
 
 def send_render_ok_email(thumbnail_presigned_url, output_zip_presigned_url, ses_config, render_details, zip_size, runtime_minutes):
     """
@@ -61,6 +63,8 @@ def send_render_ok_email(thumbnail_presigned_url, output_zip_presigned_url, ses_
         else:
             object_size_str = f"{convert_bytes_to_mb(zip_size):.2f} MB"
 
+        expiration_datetime = datetime.now() + timedelta(hours=12)
+
         # Definir los parámetros de la plantilla
         template_data = {
             'project_name': project_name,
@@ -77,7 +81,7 @@ def send_render_ok_email(thumbnail_presigned_url, output_zip_presigned_url, ses_
             'rendering_time': runtime_minutes,
             'object_size': object_size_str,
             'current_year': str(datetime.now().year),
-            'expiration_time': format_expiration_date((datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d'))  # 7 days from now 
+            'expiration_time': format_expiration_datetime(expiration_datetime)
         }
 
         # Enviar el correo electrónico utilizando la plantilla

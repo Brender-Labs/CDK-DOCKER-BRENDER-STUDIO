@@ -18,25 +18,13 @@ def main():
     args: Namespace = parser.parse_args(bpy.app.driver_namespace['argv'])
 
     video_codec = 'H264'  # 'NONE', 'DNXHD', 'DV', 'FFV1', 'FLASH', 'H264', 'HUFFYUV', 'MPEG1', 'MPEG2', 'MPEG4', 'PNG', 'QTRLE', 'THEORA', 'WEBM', 'AV1')
-    output_quality = 'MEDIUM'  # 'HIGH', 'MEDIUM', 'LOW'
+    output_quality = 'LOW'  # 'HIGH', 'MEDIUM', 'LOW'
     encoding_speed = 'GOOD'  # 'GOOD', 'REALTIME', 'BEST'
     autosplit = False 
 
     print("args:", args)
     res_x = args.resolution_x
     res_y = args.resolution_y
-
-    # Funcion para reescalar la resolucion a un maximo de 720p y que mantenga la relacion de aspecto
-    def rescale_resolution(res_x, res_y):
-        if res_x > 1280:
-            res_y = int((1280 / res_x) * res_y)
-            res_x = 1280
-        if res_y > 720:
-            res_x = int((720 / res_y) * res_x)
-            res_y = 720
-        return res_x, res_y
-    
-    res_x, res_y = rescale_resolution(res_x, res_y)
 
     scene = bpy.context.scene
     scene.render.resolution_x = res_x
@@ -49,6 +37,10 @@ def main():
     scene.render.ffmpeg.constant_rate_factor = output_quality
     scene.render.ffmpeg.ffmpeg_preset = encoding_speed
     scene.render.ffmpeg.use_autosplit = autosplit
+
+    # color management
+    scene.view_settings.view_transform = 'Standard'
+    scene.view_settings.look = 'None'
 
     output_folder = os.path.join(args.efs_project_path, 'output')
     print("Output folder:", output_folder)

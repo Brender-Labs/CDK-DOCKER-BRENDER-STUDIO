@@ -38,6 +38,10 @@ def main():
     scene.render.ffmpeg.ffmpeg_preset = encoding_speed
     scene.render.ffmpeg.use_autosplit = autosplit
 
+    # color management
+    scene.view_settings.view_transform = 'Standard'
+    scene.view_settings.look = 'None'
+
     output_folder = os.path.join(args.efs_project_path, 'output')
     print("Output folder:", output_folder)
     full_preview_path = args.efs_project_path

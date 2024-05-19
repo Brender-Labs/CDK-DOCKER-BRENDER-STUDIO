@@ -1,6 +1,8 @@
 import os
 import sys
 from app_utils.parse_json import parse_json
+from animation_ops.playblast.generate_playblast import generate_playblast
+from animation_ops.full_preview.generate_full_preview import generate_full_preview
 from output_ops.generate_thumbnail import generate_thumbnail
 from output_ops.output_to_zip import output_to_zip
 from output_ops.upload_s3 import upload_to_s3
@@ -9,6 +11,7 @@ from configure_ses.send_email import send_render_ok_email
 from configure_ses.send_email_error import send_render_error_email
 from clean_up.clean_project_efs import clean_up_project_folder_efs
 from configure_ses.batch_details import get_batch_job_info
+from animation_ops.upload_videos_s3 import upload_animation_videos
 
 def main():
     try:
@@ -37,12 +40,33 @@ def main():
         ses_active = json_ses['ses']['ses_active']
         ses_config = json_ses['ses']['ses_config']
         render_details = json_ses['ses']['render_details']
+        animation_data = json_ses['ses']['animation_preview']
         region = ses_config['region']
         job_id = ses_config['batch_job_2_id']
 
         # 1. Check if the specified EFS folder exists
         if not os.path.exists(render_output_path):
             raise FileNotFoundError(f"EFS folder not found: {render_output_path}")
+        
+        # Logic to generate playblast and full resolution preview if needed
+        render_type = render_details['render_type']
+        print(f"Render Type: {render_type}")
+        animation_full = animation_data['animation_preview_full_resolution']
+
+        if render_type == "Animation" and render_output_path:
+            print("Animation Preview, playblast will be generated low resolution")
+            generate_playblast(animation_data)
+            if animation_full:
+                print("Animation Preview is True, generating full resolution preview")
+                generate_full_preview(animation_data)
+            else:
+                print("Animation Not Full Resolution Preview, skipping full resolution preview generation")
+            
+        # aqui deberemos subir el playblast a s3, opcionalmente tambien el video de full resolution si es que se genero.
+        # nombre que se genera: _bs_playblast0001-0010.mp4, debemos extraer como empieza el nombre del archivo para subirlo a s3
+        efs_project_path = os.path.join(os.environ['EFS_BLENDER_FOLDER_PATH'], os.environ['BUCKET_KEY'])
+        print(f"EFS Project Path from efs_main script: {efs_project_path}")
+        upload_animation_videos(efs_project_path)
         
         # 2. Comprimir a .zip la carpeta /output dentro de /output (output.zip)
         output_zip_path, zip_size = output_to_zip(render_output_path)

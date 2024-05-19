@@ -25,6 +25,8 @@ export class BrenderStudioStack extends cdk.Stack {
       description: 'Name of the ECR image to use in the Batch job',
     });
 
+
+    // CONTEXT PROPS
     const blenderVersions = props?.blenderVersionsList;
     console.log('blenderVersions', blenderVersions)
 
@@ -33,10 +35,23 @@ export class BrenderStudioStack extends cdk.Stack {
     const isPrivate = Boolean(privateStack);
     console.log('isPrivate', isPrivate)
 
+    const maxvCpus = props?.maxvCpus;
+    console.log('maxvCpus before passing to createBatchResources:', maxvCpus);
+
+    if(!maxvCpus) {
+      throw new Error('maxvCpus is required');
+    }
+
+
+
     const brenderBucketName = 'brender-bucket-s3-' + uuidv4();
 
     // NEW VERSION
     // cdk deploy --context stackName=BRENDER-STACK-TEST --parameters ecrImageName=brender-repo-ecr --context blenderVersions="3.0.0,3.6.0,4.0.0" --context isPrivate="false" --region us-east-1
+
+
+    // CDK DEPLOY COMMAND with CONTEXT MAXVCPU
+    // cdk deploy --context stackName=BRENDER-STACK-TEST-vcpus --parameters ecrImageName=brender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --context  maxvCpus='{"onDemandCPU": 100, "spotCPU": 256, "onDemandGPU": 100, "spotGPU": 256}' --region us-east-1
 
     // CDK Synth COMMAND
     // cdk synth --context stackName=BRENDER-STACK-TEST --parameters ecrImageName=brender-repo-ecr --context blenderVersions="3.0.0,3.6.0,4.0.0" --context isPrivate="false" --region us-east-1
@@ -114,6 +129,7 @@ export class BrenderStudioStack extends cdk.Stack {
       s3BucketName: s3Bucket.bucketName,
       blenderVersionsList: blenderVersions,
       isPrivate,
+      maxvCpus,
     })
   }
 }

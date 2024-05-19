@@ -20,10 +20,33 @@ interface BatchResourcesProps {
     s3BucketName: string,
     blenderVersionsList: string,
     isPrivate: boolean,
+    maxvCpus: {
+        onDemandCPU: string;
+        spotCPU: string;
+        onDemandGPU: string;
+        spotGPU: string;
+    }
 }
 
 export function createBatchResources(scope: Construct, props: BatchResourcesProps) {
-    const { vpc, sg, ecrRepositoryName, efs, s3BucketName, blenderVersionsList, isPrivate } = props;
+    const { vpc, sg, ecrRepositoryName, efs, s3BucketName, blenderVersionsList, isPrivate, maxvCpus } = props;
+
+
+    console.log('maxvCpus inside createBatchResources:', maxvCpus);
+    
+    console.log('Type of maxvCpus: ', typeof maxvCpus);
+    console.log('Max vCPUs: ', maxvCpus.onDemandCPU, maxvCpus.spotCPU, maxvCpus.onDemandGPU, maxvCpus.spotGPU)
+
+
+
+
+    // parse int values maxvCpus
+    const parsedMaxvCpus = {
+        onDemandCPU: parseInt(maxvCpus.onDemandCPU, 10),
+        spotCPU: parseInt(maxvCpus.spotCPU, 10),
+        onDemandGPU: parseInt(maxvCpus.onDemandGPU, 10),
+        spotGPU: parseInt(maxvCpus.spotGPU, 10),
+    };
 
 
     const ecrRepository = Repository.fromRepositoryName(scope, 'ECRRepository', ecrRepositoryName);
@@ -64,7 +87,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         computeEnvironmentName: 'ComputeEnvOnDemandCPU-' + uuidv4(),
         securityGroups: [sg],
         minvCpus: 0,
-        maxvCpus: 256,
+        maxvCpus: parsedMaxvCpus.onDemandCPU,
         enabled: true,
         instanceTypes: [new InstanceType('c5')]
     })
@@ -91,7 +114,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         ],
         securityGroups: [sg],
         minvCpus: 0,
-        maxvCpus: 256,
+        maxvCpus: parsedMaxvCpus.spotCPU,
         enabled: true,
         computeEnvironmentName: 'ComputeEnvSpotCPU-' + uuidv4(),
         spot: true,
@@ -122,7 +145,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         computeEnvironmentName: 'ComputeEnvOnDemandGPU-' + uuidv4(),
         securityGroups: [sg],
         minvCpus: 0,
-        maxvCpus: 256,
+        maxvCpus: parsedMaxvCpus.onDemandGPU,
         enabled: true,
     })
 
@@ -145,7 +168,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         ],
         securityGroups: [sg],
         minvCpus: 0,
-        maxvCpus: 256,
+        maxvCpus: parsedMaxvCpus.spotGPU,
         enabled: true,
         computeEnvironmentName: 'ComputeEnvSpotGPU-' + uuidv4(),
         spot: true,

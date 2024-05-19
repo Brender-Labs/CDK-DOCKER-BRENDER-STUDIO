@@ -5,9 +5,9 @@ export interface BrenderStudioStackProps extends cdk.StackProps {
   blenderVersionsList: string;
   isPrivate: boolean;
   maxvCpus: {
-    onDemandCPU: number;
-    spotCPU: number;
-    onDemandGPU: number;
-    spotGPU: number;
+    onDemandCPU: string;
+    spotCPU: string;
+    onDemandGPU: string;
+    spotGPU: string;
   }
 }

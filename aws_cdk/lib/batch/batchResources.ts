@@ -42,10 +42,10 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
 
     // parse int values maxvCpus
     const parsedMaxvCpus = {
-        onDemandCPU: parseInt(maxvCpus.onDemandCPU, 10),
-        spotCPU: parseInt(maxvCpus.spotCPU, 10),
-        onDemandGPU: parseInt(maxvCpus.onDemandGPU, 10),
-        spotGPU: parseInt(maxvCpus.spotGPU, 10),
+        onDemandCPU: parseInt(maxvCpus.onDemandCPU, 256),
+        spotCPU: parseInt(maxvCpus.spotCPU, 256),
+        onDemandGPU: parseInt(maxvCpus.onDemandGPU, 192),
+        spotGPU: parseInt(maxvCpus.spotGPU, 192),
     };
 
 
@@ -69,7 +69,6 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
 
     const computeEnvOnDemandCPU = new ManagedEc2EcsComputeEnvironment(scope, 'ComputeEnvOnDemandCPU-' + uuidv4(), {
         useOptimalInstanceClasses: true,
-
         instanceRole: new Role(scope, 'ComputeEnvironmentRoleOnDemandCPU', {
             assumedBy: new ServicePrincipal('ec2.amazonaws.com'),
             managedPolicies: [

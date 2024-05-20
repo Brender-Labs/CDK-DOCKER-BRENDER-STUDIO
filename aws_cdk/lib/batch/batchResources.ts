@@ -42,10 +42,10 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
 
     // parse int values maxvCpus
     const parsedMaxvCpus = {
-        onDemandCPU: parseInt(maxvCpus.onDemandCPU, 256),
-        spotCPU: parseInt(maxvCpus.spotCPU, 256),
-        onDemandGPU: parseInt(maxvCpus.onDemandGPU, 192),
-        spotGPU: parseInt(maxvCpus.spotGPU, 192),
+        onDemandCPU: parseInt(maxvCpus.onDemandCPU, 10),
+        spotCPU: parseInt(maxvCpus.spotCPU, 10),
+        onDemandGPU: parseInt(maxvCpus.onDemandGPU, 10),
+        spotGPU: parseInt(maxvCpus.spotGPU, 10),
     };
 
 

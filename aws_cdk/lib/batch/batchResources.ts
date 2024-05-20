@@ -33,7 +33,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
 
 
     console.log('maxvCpus inside createBatchResources:', maxvCpus);
-    
+
     console.log('Type of maxvCpus: ', typeof maxvCpus);
     console.log('Max vCPUs: ', maxvCpus.onDemandCPU, maxvCpus.spotCPU, maxvCpus.onDemandGPU, maxvCpus.spotGPU)
 
@@ -42,10 +42,10 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
 
     // parse int values maxvCpus
     const parsedMaxvCpus = {
-        onDemandCPU: parseInt(maxvCpus.onDemandCPU, 10),
-        spotCPU: parseInt(maxvCpus.spotCPU, 10),
-        onDemandGPU: parseInt(maxvCpus.onDemandGPU, 10),
-        spotGPU: parseInt(maxvCpus.spotGPU, 10),
+        onDemandCPU: parseInt(maxvCpus.onDemandCPU, 256),
+        spotCPU: parseInt(maxvCpus.spotCPU, 256),
+        onDemandGPU: parseInt(maxvCpus.onDemandGPU, 192),
+        spotGPU: parseInt(maxvCpus.spotGPU, 192),
     };
 
 
@@ -69,7 +69,6 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
 
     const computeEnvOnDemandCPU = new ManagedEc2EcsComputeEnvironment(scope, 'ComputeEnvOnDemandCPU-' + uuidv4(), {
         useOptimalInstanceClasses: true,
-
         instanceRole: new Role(scope, 'ComputeEnvironmentRoleOnDemandCPU', {
             assumedBy: new ServicePrincipal('ec2.amazonaws.com'),
             managedPolicies: [
@@ -91,6 +90,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         enabled: true,
         instanceTypes: [new InstanceType('c5')]
     })
+    computeEnvOnDemandCPU.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
 
 
 
@@ -121,7 +121,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         spotBidPercentage: 100,
         allocationStrategy: AllocationStrategy.SPOT_CAPACITY_OPTIMIZED,
     });
-
+    computeEnvSpotCPU.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
 
     // =================COMPUTE ENVIRONMENTS GPU=================
 
@@ -148,6 +148,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         maxvCpus: parsedMaxvCpus.onDemandGPU,
         enabled: true,
     })
+    computeEnvOnDemandGPU.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
 
     const computeEnvSpotGPU = new ManagedEc2EcsComputeEnvironment(scope, 'ComputeEnvSpotGPU-' + uuidv4(), {
         // useOptimalInstanceClasses: true,
@@ -175,6 +176,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         spotBidPercentage: 100,
         allocationStrategy: AllocationStrategy.SPOT_CAPACITY_OPTIMIZED,
     });
+    computeEnvSpotGPU.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
 
 
     // =================JOB QUEUES CPU=================
@@ -186,6 +188,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         jobQueueName: 'JobQueueSpotCPU-' + uuidv4(),
         priority: 10,
     });
+    jobQueueSpotCPU.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
 
     const jobQueueOnDemandCPU = new JobQueue(scope, 'JobQueueOnDemandCPU-' + uuidv4(), {
         computeEnvironments: [{
@@ -195,6 +198,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         priority: 10,
         jobQueueName: 'JobQueueOnDemandCPU-' + uuidv4(),
     });
+    jobQueueOnDemandCPU.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
 
 
     // =================JOB QUEUES GPU=================
@@ -206,6 +210,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         jobQueueName: 'JobQueueSpotGPU-' + uuidv4(),
         priority: 10,
     });
+    jobQueueSpotGPU.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
 
     const jobQueueOnDemandGPU = new JobQueue(scope, 'JobQueueOnDemandGPU-' + uuidv4(), {
         computeEnvironments: [{
@@ -215,6 +220,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         jobQueueName: 'JobQueueOnDemandGPU-' + uuidv4(),
         priority: 10,
     });
+    jobQueueOnDemandGPU.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
 
     // Context param ex: "4.0.0,4.0.0,3.6.0" : new version
 

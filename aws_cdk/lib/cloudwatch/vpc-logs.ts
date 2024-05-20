@@ -1,3 +1,4 @@
+import { RemovalPolicy } from "aws-cdk-lib";
 import { FlowLog, FlowLogDestination, FlowLogResourceType, IVpc } from "aws-cdk-lib/aws-ec2";
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
@@ -23,6 +24,8 @@ export function createVpcCloudwatchLogs(scope: Construct, props: VpcLogsProps) {
         resourceType: FlowLogResourceType.fromVpc(vpc),
         destination: FlowLogDestination.toCloudWatchLogs(logGroup, role),
     });
+
+    vpcFlowLogs.applyRemovalPolicy(RemovalPolicy.DESTROY)
 
     return vpcFlowLogs;
 }

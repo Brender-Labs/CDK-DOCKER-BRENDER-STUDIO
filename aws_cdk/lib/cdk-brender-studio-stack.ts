@@ -25,6 +25,11 @@ export class BrenderStudioStack extends cdk.Stack {
       description: 'Name of the ECR image to use in the Batch job',
     });
 
+    // const ecrRepoNameParameter = new cdk.CfnParameter(this, 'ecrRepoName', {
+    //   type: 'String',
+    //   description: 'Name of the ECR repository',
+    // });
+
 
     // CONTEXT PROPS
     const blenderVersions = props?.blenderVersionsList;

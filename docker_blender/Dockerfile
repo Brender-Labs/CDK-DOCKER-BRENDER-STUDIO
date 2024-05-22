@@ -66,6 +66,8 @@ RUN chmod +x /app/app.py
 
 WORKDIR /app
 
-ENV PYTHONPATH=/app:$PYTHONPATH
+# ENV PYTHONPATH=/app:$PYTHONPATH
+ENV PYTHONPATH=/app:/mnt/efs/projects:$PYTHONPATH
+
 
 ENTRYPOINT ["python3", "/app/app.py"]

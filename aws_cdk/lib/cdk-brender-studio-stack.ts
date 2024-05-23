@@ -19,7 +19,7 @@ export class BrenderStudioStack extends cdk.Stack {
 
     const lambdaLocalMountPath = '/mnt/files';
 
-    // PARAMETERS
+    // PARAMETERS OLD
     // const ecrImageNameParameter = new cdk.CfnParameter(this, 'ecrImageName', {
     //   type: 'String',
     //   description: 'Name of the ECR image to use in the Batch job',
@@ -55,7 +55,7 @@ export class BrenderStudioStack extends cdk.Stack {
     // cdk deploy --context stackName=BRENDER-STACK-TEST --parameters ecrImageName=brender-repo-ecr --context blenderVersions="3.0.0,3.6.0,4.0.0" --context isPrivate="false" --region us-east-1
 
 
-    // CDK DEPLOY COMMAND with CONTEXT MAXVCPU
+    // CDK DEPLOY with new name parameter ECR
     // cdk deploy --context stackName=BRENDER-STACK-TEST-Ecr --parameters ecrRepoName=brender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --context  maxvCpus='{"onDemandCPU": 100, "spotCPU": 256, "onDemandGPU": 100, "spotGPU": 256}' --region us-east-1
 
 

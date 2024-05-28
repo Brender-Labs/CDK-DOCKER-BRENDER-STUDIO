@@ -17,7 +17,13 @@ def setup_display(use_eevee):
 def setup_env_python_path(bucket_key):
     efs_project_path = f"/mnt/efs/projects/{bucket_key}"
     print('Ruta al directorio del proyecto:', efs_project_path)
-    os.environ['PYTHONPATH'] = f"{efs_project_path}:{os.environ.get('PYTHONPATH', '')}"
+    
+    # Añade la ruta de los paquetes de Python
+    python_site_packages = '/usr/local/lib/python3.10/dist-packages'
+    os.environ['PYTHONPATH'] = f"{efs_project_path}:{python_site_packages}:{os.environ.get('PYTHONPATH', '')}"
+    
+    # Imprimir PYTHONPATH para depuración
+    print("PYTHONPATH:", os.environ['PYTHONPATH'])
     
 
 # Obtener las variables de entorno

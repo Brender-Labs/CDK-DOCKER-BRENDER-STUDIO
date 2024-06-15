@@ -10,4 +10,9 @@ export interface BrenderStudioStackProps extends cdk.StackProps {
     onDemandGPU: string;
     spotGPU: string;
   }
+  useG6Instances: boolean;
+  spotBidPercentage: {
+    spotCPU: string;
+    spotGPU: string;
+  }
 }

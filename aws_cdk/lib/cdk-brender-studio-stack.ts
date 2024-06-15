@@ -40,8 +40,21 @@ export class BrenderStudioStack extends cdk.Stack {
     const isPrivate = Boolean(privateStack);
     console.log('isPrivate', isPrivate)
 
+    const useG6Instances = props?.useG6Instances;
+    const useG6 = Boolean(useG6Instances);
+
+    console.log('useG6Instances', useG6Instances)
+    console.log('useG6', useG6)
+
     const maxvCpus = props?.maxvCpus;
     console.log('maxvCpus before passing to createBatchResources:', maxvCpus);
+
+    const spotBidPercentage = props?.spotBidPercentage;
+    console.log('spotBidPercentage', spotBidPercentage);
+
+    if(!spotBidPercentage) {
+      throw new Error('spotBidPercentage is required');
+    }
 
     if(!maxvCpus) {
       throw new Error('maxvCpus is required');
@@ -52,18 +65,23 @@ export class BrenderStudioStack extends cdk.Stack {
     const brenderBucketName = 'brender-bucket-s3-' + uuidv4();
 
     // NEW VERSION
-    // cdk deploy --context stackName=BRENDER-STACK-TEST --parameters ecrImageName=brender-repo-ecr --context blenderVersions="3.0.0,3.6.0,4.0.0" --context isPrivate="false" --region us-east-1
+    // cdk deploy --context stackName=BRENDER-STACK-TEST --parameters ecrImageName=blender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --region us-east-1
 
 
     // CDK DEPLOY with new name parameter ECR
-    // cdk deploy --context stackName=BRENDER-STACK-TEST-Ecr --parameters ecrRepoName=brender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --context  maxvCpus='{"onDemandCPU": 100, "spotCPU": 256, "onDemandGPU": 100, "spotGPU": 256}' --region us-east-1
+    // cdk deploy --context stackName=BRENDER-STACK-TEST-Ecr --parameters ecrRepoName=blender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --context  maxvCpus='{"onDemandCPU": 100, "spotCPU": 256, "onDemandGPU": 100, "spotGPU": 256}' --region us-east-1
 
 
     // Version with EFS
-    // cdk deploy --context stackName=BRENDER-STACK-TEST-vcpus --parameters ecrImageName=brender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --context  maxvCpus='{"onDemandCPU": 100, "spotCPU": 256, "onDemandGPU": 100, "spotGPU": 256}' --region us-east-1
+    // cdk deploy --context stackName=BRENDER-STACK-TEST-vcpus --parameters ecrImageName=blender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --context  maxvCpus='{"onDemandCPU": 100, "spotCPU": 256, "onDemandGPU": 100, "spotGPU": 256}' --region us-east-1
 
     // CDK Synth COMMAND
-    // cdk synth --context stackName=BRENDER-STACK-TEST --parameters ecrImageName=brender-repo-ecr --context blenderVersions="3.0.0,3.6.0,4.0.0" --context isPrivate="false" --region us-east-1
+    // cdk synth --context stackName=BRENDER-STACK-TEST --parameters ecrImageName=blender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --region us-east-1
+
+
+    // TEST 
+    //  cdk deploy --context stackName=BRENDER-STACK-G-EC2 --parameters ecrImageName=blender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --context maxvCpus='{"onDemandCPU": 100, "spotCPU": 256, "onDemandGPU": 100, "spotGPU": 256}' --context spotBidPercentage='{"spotCPU": 80, "spotGPU": 90}' --context useG6Instances="true" --region us-east-1
+
 
     const vpc = createVpc(this, {
       name: 'Vpc-' + uuidv4(),
@@ -139,6 +157,8 @@ export class BrenderStudioStack extends cdk.Stack {
       blenderVersionsList: blenderVersions,
       isPrivate,
       maxvCpus,
+      spotBidPercentage,
+      useG6Instances: useG6,
     })
   }
 }

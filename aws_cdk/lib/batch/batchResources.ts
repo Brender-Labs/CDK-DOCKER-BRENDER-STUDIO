@@ -26,19 +26,23 @@ interface BatchResourcesProps {
         onDemandGPU: string;
         spotGPU: string;
     }
+    useG6Instances: boolean;
+    spotBidPercentage: {
+        spotCPU: string;
+        spotGPU: string;
+    }
 }
 
 export function createBatchResources(scope: Construct, props: BatchResourcesProps) {
-    const { vpc, sg, ecrRepositoryName, efs, s3BucketName, blenderVersionsList, isPrivate, maxvCpus } = props;
+    const { vpc, sg, ecrRepositoryName, efs, s3BucketName, blenderVersionsList, isPrivate, maxvCpus, useG6Instances, spotBidPercentage } = props;
 
 
     console.log('maxvCpus inside createBatchResources:', maxvCpus);
 
     console.log('Type of maxvCpus: ', typeof maxvCpus);
     console.log('Max vCPUs: ', maxvCpus.onDemandCPU, maxvCpus.spotCPU, maxvCpus.onDemandGPU, maxvCpus.spotGPU)
-
-
-
+    console.log('Type of spotBidPercentage: ', typeof spotBidPercentage);
+    console.log('Spot Bid Percentage: ', spotBidPercentage.spotCPU, spotBidPercentage.spotGPU)
 
     // parse int values maxvCpus
     const parsedMaxvCpus = {
@@ -46,6 +50,11 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         spotCPU: parseInt(maxvCpus.spotCPU, 10),
         onDemandGPU: parseInt(maxvCpus.onDemandGPU, 10),
         spotGPU: parseInt(maxvCpus.spotGPU, 10),
+    };
+
+    const parsedSpotBidPercentage = {
+        spotCPU: parseInt(spotBidPercentage.spotCPU, 10),
+        spotGPU: parseInt(spotBidPercentage.spotGPU, 10),
     };
 
 
@@ -78,9 +87,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
             ],
         }),
         vpc,
-        // all az subnets 
         vpcSubnets: {
-            // subnetType: isPrivate ? SubnetType.PRIVATE_WITH_EGRESS : SubnetType.PUBLIC,
             subnets: allSubnets,
         },
         computeEnvironmentName: 'ComputeEnvOnDemandCPU-' + uuidv4(),
@@ -88,14 +95,14 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         minvCpus: 0,
         maxvCpus: parsedMaxvCpus.onDemandCPU,
         enabled: true,
-        instanceTypes: [new InstanceType('c5')]
+        // instanceTypes: [new InstanceType('c5')]
     })
     computeEnvOnDemandCPU.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
 
 
 
     const computeEnvSpotCPU = new ManagedEc2EcsComputeEnvironment(scope, 'ComputeEnvSpotCPU-' + uuidv4(), {
-        // useOptimalInstanceClasses: true,
+        useOptimalInstanceClasses: true,
         instanceRole: new Role(scope, 'ComputeEnvironmentRoleSpotCPU', {
             assumedBy: new ServicePrincipal('ec2.amazonaws.com'),
             managedPolicies: [
@@ -108,17 +115,17 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         vpcSubnets: {
             subnets: allSubnets,
         },
-        instanceTypes: [
-            new InstanceType('optimal')
-            // ADD MORE INSTANCES TYPES (CPU)
-        ],
+        // instanceTypes: [
+        //     new InstanceType('optimal')
+        //     // ADD MORE INSTANCES TYPES (CPU)
+        // ],
         securityGroups: [sg],
         minvCpus: 0,
         maxvCpus: parsedMaxvCpus.spotCPU,
         enabled: true,
         computeEnvironmentName: 'ComputeEnvSpotCPU-' + uuidv4(),
         spot: true,
-        spotBidPercentage: 100,
+        spotBidPercentage: parsedSpotBidPercentage.spotCPU,
         allocationStrategy: AllocationStrategy.SPOT_CAPACITY_OPTIMIZED,
     });
     computeEnvSpotCPU.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
@@ -173,11 +180,88 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         enabled: true,
         computeEnvironmentName: 'ComputeEnvSpotGPU-' + uuidv4(),
         spot: true,
-        spotBidPercentage: 100,
+        spotBidPercentage: parsedSpotBidPercentage.spotGPU,
         allocationStrategy: AllocationStrategy.SPOT_CAPACITY_OPTIMIZED,
     });
     computeEnvSpotGPU.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
 
+    // ================= COMPUTE ENV G6 =================
+
+    if (useG6Instances) {
+        const computeEnvOnDemandGPUG6 = new ManagedEc2EcsComputeEnvironment(scope, 'ComputeEnvOnDemandGPUG6-' + uuidv4(), {
+            instanceRole: new Role(scope, 'ComputeEnvironmentRoleOnDemandG6', {
+                assumedBy: new ServicePrincipal('ec2.amazonaws.com'),
+                managedPolicies: [
+                    ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonEC2ContainerServiceforEC2Role'),
+                    s3Policy,
+                    batchPolicy,
+                ],
+            }),
+            vpc,
+            vpcSubnets: {
+                subnets: allSubnets,
+            },
+            instanceTypes: [
+                new InstanceType('g6')
+            ],
+            computeEnvironmentName: 'ComputeEnvOnDemandGPUG6-' + uuidv4(),
+            securityGroups: [sg],
+            minvCpus: 0,
+            maxvCpus: parsedMaxvCpus.onDemandGPU,
+            enabled: true,
+        })
+        computeEnvOnDemandGPUG6.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
+
+        const computeEnvSpotGPUG6 = new ManagedEc2EcsComputeEnvironment(scope, 'ComputeEnvSpotGPUG6-' + uuidv4(), {
+            // useOptimalInstanceClasses: true,
+            instanceRole: new Role(scope, 'ComputeEnvironmentRoleSpotG6', {
+                assumedBy: new ServicePrincipal('ec2.amazonaws.com'),
+                managedPolicies: [
+                    ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonEC2ContainerServiceforEC2Role'),
+                    s3Policy,
+                    batchPolicy,
+                ],
+            }),
+            vpc,
+            vpcSubnets: {
+                subnets: allSubnets,
+            },
+            instanceTypes: [
+                new InstanceType('g6')
+            ],
+            securityGroups: [sg],
+            minvCpus: 0,
+            maxvCpus: parsedMaxvCpus.spotGPU,
+            enabled: true,
+            computeEnvironmentName: 'ComputeEnvSpotGPUG6-' + uuidv4(),
+            spot: true,
+            spotBidPercentage: parsedSpotBidPercentage.spotGPU,
+            allocationStrategy: AllocationStrategy.SPOT_CAPACITY_OPTIMIZED,
+        });
+        computeEnvSpotGPUG6.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
+
+        // =================JOB QUEUES G6=================
+
+        const jobQueueSpotGPUG6 = new JobQueue(scope, 'JobQueueSpotGPUG6-' + uuidv4(), {
+            computeEnvironments: [{
+                computeEnvironment: computeEnvSpotGPUG6,
+                order: 1,
+            }],
+            jobQueueName: 'JobQueueSpotGPUG6-' + uuidv4(),
+            priority: 10,
+        });
+        jobQueueSpotGPUG6.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
+
+        const jobQueueOnDemandGPUG6 = new JobQueue(scope, 'JobQueueOnDemandGPUG6-' + uuidv4(), {
+            computeEnvironments: [{
+                computeEnvironment: computeEnvOnDemandGPUG6,
+                order: 1,
+            }],
+            jobQueueName: 'JobQueueOnDemandGPUG6-' + uuidv4(),
+            priority: 10,
+        });
+        jobQueueOnDemandGPUG6.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY)
+    }
 
     // =================JOB QUEUES CPU=================
     const jobQueueSpotCPU = new JobQueue(scope, 'JobQueueSpotCPU-' + uuidv4(), {
@@ -234,7 +318,7 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         console.log('jobDefinitionName: ', jobDefinitionName);
 
         new EcsJobDefinition(scope, jobDefinitionName, {
-            timeout: cdk.Duration.minutes(60),
+            timeout: cdk.Duration.days(1),
             retryAttempts: 3,
             jobDefinitionName: jobDefinitionName,
             container: new EcsEc2ContainerDefinition(scope, containerDefinitionName, {

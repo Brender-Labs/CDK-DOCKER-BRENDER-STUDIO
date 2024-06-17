@@ -64,24 +64,8 @@ export class BrenderStudioStack extends cdk.Stack {
 
     const brenderBucketName = 'brender-bucket-s3-' + uuidv4();
 
-    // NEW VERSION
-    // cdk deploy --context stackName=BRENDER-STACK-TEST --parameters ecrImageName=blender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --region us-east-1
-
-
-    // CDK DEPLOY with new name parameter ECR
-    // cdk deploy --context stackName=BRENDER-STACK-TEST-Ecr --parameters ecrRepoName=blender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --context  maxvCpus='{"onDemandCPU": 100, "spotCPU": 256, "onDemandGPU": 100, "spotGPU": 256}' --region us-east-1
-
-
-    // Version with EFS
-    // cdk deploy --context stackName=BRENDER-STACK-TEST-vcpus --parameters ecrImageName=blender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --context  maxvCpus='{"onDemandCPU": 100, "spotCPU": 256, "onDemandGPU": 100, "spotGPU": 256}' --region us-east-1
-
-    // CDK Synth COMMAND
-    // cdk synth --context stackName=BRENDER-STACK-TEST --parameters ecrImageName=blender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --region us-east-1
-
-
-    // TEST 
-    //  cdk deploy --context stackName=BRENDER-STACK-G-EC2 --parameters ecrImageName=blender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --context maxvCpus='{"onDemandCPU": 100, "spotCPU": 256, "onDemandGPU": 100, "spotGPU": 256}' --context spotBidPercentage='{"spotCPU": 80, "spotGPU": 90}' --context useG6Instances="true" --region us-east-1
-
+    // COMMAND DEPLOY STACK
+    // cdk deploy --context stackName=BRENDER-STACK-BATCH-REFACTOR-V5 --parameters ecrRepoName=blender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --context maxvCpus="{\"onDemandCPU\": \"100\", \"spotCPU\": \"256\", \"onDemandGPU\": \"100\", \"spotGPU\": \"256\"}" --context spotBidPercentage="{\"spotCPU\": \"80\", \"spotGPU\": \"90\"}" --context useG6Instances="true" --region us-east-1
 
     const vpc = createVpc(this, {
       name: 'Vpc-' + uuidv4(),
@@ -93,12 +77,6 @@ export class BrenderStudioStack extends cdk.Stack {
       name: 'SecurityGroup-' + uuidv4(),
       vpc
     })
-
-    // vpc.addInterfaceEndpoint('vpc-interface-endpoint-efs', {
-    //   service: InterfaceVpcEndpointAwsService.ELASTIC_FILESYSTEM,
-    //   securityGroups: [vpcSecurityGroup],
-    //   privateDnsEnabled: true,
-    // });
 
     const efs = createFileSystem(this, {
       name: 'Efs-' + uuidv4(),

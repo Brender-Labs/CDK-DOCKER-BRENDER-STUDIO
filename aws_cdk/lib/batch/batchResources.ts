@@ -1,10 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
-import { AllocationStrategy, EcsEc2ContainerDefinition, EcsJobDefinition, EcsVolume, JobQueue, ManagedEc2EcsComputeEnvironment } from "aws-cdk-lib/aws-batch";
-import { ISecurityGroup, IVpc, InstanceType, SubnetType } from "aws-cdk-lib/aws-ec2";
+import { EcsEc2ContainerDefinition, EcsJobDefinition, EcsVolume } from "aws-cdk-lib/aws-batch";
+import { ISecurityGroup, IVpc, SubnetType } from "aws-cdk-lib/aws-ec2";
 import { Repository } from "aws-cdk-lib/aws-ecr";
 import { ContainerImage } from "aws-cdk-lib/aws-ecs";
 import { IFileSystem } from 'aws-cdk-lib/aws-efs';
-import { ManagedPolicy, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
+import { ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { createS3Policy } from '../iam-roles/s3/createS3Policy';
 import { v4 as uuidv4 } from 'uuid';
@@ -78,21 +78,21 @@ export function createBatchResources(scope: Construct, props: BatchResourcesProp
         console.log(`Subnet ${subnet.subnetId} en la zona de disponibilidad ${subnet.availabilityZone}`);
     });
 
-    // Crear entornos de cómputo y colas de trabajos para CPU
+    // Create CPU compute environments and job queues
     const { computeEnvOnDemandCPU, computeEnvSpotCPU } = createCpuComputeEnvironments(scope, vpc, sg, allSubnets, s3Policy, batchPolicy, parsedMaxvCpus, parsedSpotBidPercentage);
     createCpuJobQueues(scope, computeEnvOnDemandCPU, computeEnvSpotCPU);
 
-    // Crear entornos de cómputo y colas de trabajos para G5
+    // Create GPU compute environments and job queues for G5
     const { computeEnvOnDemandG5, computeEnvSpotG5 } = createG5ComputeEnvironments(scope, vpc, sg, allSubnets, s3Policy, batchPolicy, parsedMaxvCpus, parsedSpotBidPercentage);
     createG5JobQueues(scope, computeEnvOnDemandG5, computeEnvSpotG5);
 
-    // // Crear entornos de cómputo y colas de trabajos para G6
+    // // Create GPU compute environments and job queues for G6
     if (useG6Instances) {
         const { computeEnvOnDemandG6, computeEnvSpotG6 } = createG6ComputeEnvironments(scope, vpc, sg, allSubnets, s3Policy, batchPolicy, parsedMaxvCpus, parsedSpotBidPercentage);
         createG6JobQueues(scope, computeEnvOnDemandG6, computeEnvSpotG6);
     }
 
-    // Context param ex: "4.0.0,4.0.0,3.6.0" : new version
+    // Context param ex: "4.0.0,4.0.0,3.6.0" 
 
     let blenderList = blenderVersionsList.split(',').map(version => version.toLowerCase());
     console.log('blenderList: ', blenderList);

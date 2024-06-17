@@ -19,12 +19,6 @@ export class BrenderStudioStack extends cdk.Stack {
 
     const lambdaLocalMountPath = '/mnt/files';
 
-    // PARAMETERS OLD
-    // const ecrImageNameParameter = new cdk.CfnParameter(this, 'ecrImageName', {
-    //   type: 'String',
-    //   description: 'Name of the ECR image to use in the Batch job',
-    // });
-
     const ecrRepositoryName = new cdk.CfnParameter(this, 'ecrRepoName', {
       type: 'String',
       description: 'Name of the ECR repository',

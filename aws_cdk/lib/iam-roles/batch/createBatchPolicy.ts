@@ -16,7 +16,11 @@ export function createBatchPolicy(scope: Construct) {
                     'ses:SendTemplatedEmail',
                     'ses:SendEmail',
                     'ses:SendRawEmail',
-                    'ses:SendBulkTemplatedEmail'
+                    'ses:SendBulkTemplatedEmail',
+                    'ecs:DescribeContainerInstances', // new
+                    'ecs:ListContainerInstances', 
+                    'ecs:DescribeClusters', 
+                    'ec2:DescribeInstances' 
                 ],
                 resources: ['*'],
             }),

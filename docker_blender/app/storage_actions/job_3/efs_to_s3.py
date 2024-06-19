@@ -48,7 +48,7 @@ def main():
         print(f"Render Type: {render_type}")
 
         # Check if the specified EFS folder exists
-        if not os.path.exists(render_output_path):
+        if not os.path.exists(render_output_path) or not os.listdir(render_output_path):
             print(f"EFS folder not found: {render_output_path}") # Eso es que no hay renders guardados en el path
             # SI ses_active es True, enviar correo de error, si es False, terminar el proceso
             if ses_active:
@@ -60,16 +60,12 @@ def main():
             clean_up_project_folder_efs(efs_path, bucket_key)
         else:
             print(f"EFS folder found: {render_output_path}")
-            # nombre que se genera: _bs_playblast0001-0010.mp4, debemos extraer como empieza el nombre del archivo para subirlo a s3
-            efs_project_path = os.path.join(os.environ['EFS_BLENDER_FOLDER_PATH'], os.environ['BUCKET_KEY'])
-            print(f"EFS Project Path from efs_main script: {efs_project_path}")
-            upload_animation_videos(efs_project_path)
             
             # 2. Comprimir a .zip la carpeta /output dentro de /output (output.zip)
             output_zip_path, zip_size = output_to_zip(render_output_path)
             print(f"output.zip created path: {output_zip_path}")
             print(f"Size of output.zip: {zip_size} bytes")
-            
+                
             # 3. Crear thumbnail de la primera imagen que haya en output, guardarlo en la misma ruta de files (efs project path env) como: _thumbnail.png
             thumbnail_path = generate_thumbnail(render_output_path, thumbnail_output_path)
             print(f"Thumbnail created path: {thumbnail_path}")

@@ -1,7 +1,7 @@
 import boto3
 from datetime import datetime, timedelta, timezone
 
-def get_batch_job_info(job_id, region, render_details):
+def get_batch_job_info(job_id, region, render_details, job_array_size):
     try:
         # Crear cliente de AWS Batch
         batch_client = boto3.client('batch', region_name=region)
@@ -10,12 +10,13 @@ def get_batch_job_info(job_id, region, render_details):
         render_type = render_details['render_type']
         print(f"Render Type: {render_type}")
 
-        if render_type == 'Animation':
-            # Obtener detalles del trabajo child
-            response = batch_client.describe_jobs(jobs=[job_id + ':0'])
-        elif render_type == 'Still':
-            # Obtener detalles del trabajo
-            response = batch_client.describe_jobs(jobs=[job_id])
+        if int(job_array_size) > 1:
+            job_id = f"{job_id}:0"
+        else:
+            job_id = job_id
+
+        # Obtener detalles del trabajo
+        response = batch_client.describe_jobs(jobs=[job_id])
 
         # Verificar si se recibió una respuesta válida
         if 'jobs' not in response or len(response['jobs']) == 0:

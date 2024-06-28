@@ -47,13 +47,41 @@ export function createVpc(scope: Construct, props: VpcProps): IVpc {
         vpc.applyRemovalPolicy(RemovalPolicy.DESTROY);
         return vpc;
     } else {
-        const vpc = new Vpc(scope, name);
+        const vpc = new Vpc(scope, name, {
+            natGateways: 1,
+            maxAzs: 99,
+            subnetConfiguration: [
+                {
+                    cidrMask: 24,
+                    name: 'public-subnet-1',
+                    subnetType: SubnetType.PUBLIC,
+                },
+                {
+                    cidrMask: 24,
+                    name: 'public-subnet-2',
+                    subnetType: SubnetType.PUBLIC,
+                },
+                {
+                    cidrMask: 24,
+                    name: 'private-subnet-1',
+                    subnetType: SubnetType.PRIVATE_WITH_EGRESS,
+                },
+                {
+                    cidrMask: 24,
+                    name: 'private-subnet-2',
+                    subnetType: SubnetType.PRIVATE_WITH_EGRESS,
+                }
+            ],
+        });
 
         const s3GatewayEndpoint = vpc.addGatewayEndpoint(gatewayEndpointName, {
             service: GatewayVpcEndpointAwsService.S3,
         });
 
+
         vpc.applyRemovalPolicy(RemovalPolicy.DESTROY);
-        return vpc;
+        return vpc
+        // const vpc = new Vpc(scope, name);
+        // return vpc;
     }
 }

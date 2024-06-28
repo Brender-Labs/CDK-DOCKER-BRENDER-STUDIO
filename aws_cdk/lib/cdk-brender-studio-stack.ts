@@ -59,7 +59,7 @@ export class BrenderStudioStack extends cdk.Stack {
     const brenderBucketName = 'brender-bucket-s3-' + uuidv4();
 
     // COMMAND DEPLOY STACK
-    // cdk deploy --context stackName=BRENDER-STACK-BATCH-REFACTOR-V5 --parameters ecrRepoName=blender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="false" --context maxvCpus="{\"onDemandCPU\": \"100\", \"spotCPU\": \"256\", \"onDemandGPU\": \"100\", \"spotGPU\": \"256\"}" --context spotBidPercentage="{\"spotCPU\": \"80\", \"spotGPU\": \"90\"}" --context useG6Instances="true" --region us-east-1
+    // cdk deploy --context stackName=BRENDER-STACK-BATCH-REFACTOR-V5 --parameters ecrRepoName=blender-repo-ecr --context blenderVersions="4.1.1" --context isPrivate="true" --context maxvCpus="{\"onDemandCPU\": \"100\", \"spotCPU\": \"256\", \"onDemandGPU\": \"100\", \"spotGPU\": \"256\"}" --context spotBidPercentage="{\"spotCPU\": \"80\", \"spotGPU\": \"90\"}" --context useG6Instances="true" --region us-east-1
 
     const vpc = createVpc(this, {
       name: 'Vpc-' + uuidv4(),

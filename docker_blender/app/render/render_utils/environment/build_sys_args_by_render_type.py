@@ -74,14 +74,14 @@ def build_sys_args_by_render_type(json_blender_render):
             "-samples", str(render_info['cycles_config']['samples']),
         ]
 
-    if render_config['engine'] == "BLENDER_EEVEE":
-        eevee_sys_args = [
-            "-taa_samples", str(render_info['eevee_config']['taa_samples']),
-            "-cube_size", str(render_info['eevee_config']['shadows']['cube_size']),
-            "-cascade_size", str(render_info['eevee_config']['shadows']['cascade_size']),
-            "-high_bitdepth", str(render_info['eevee_config']['shadows']['high_bitdepth']),
-            "-soft_shadows", str(render_info['eevee_config']['shadows']['soft_shadows']),
-        ]
+    # if render_config['engine'] == "BLENDER_EEVEE":
+    #     eevee_sys_args = [
+    #         "-taa_samples", str(render_info['eevee_config']['taa_samples']),
+    #         "-cube_size", str(render_info['eevee_config']['shadows']['cube_size']),
+    #         "-cascade_size", str(render_info['eevee_config']['shadows']['cascade_size']),
+    #         "-high_bitdepth", str(render_info['eevee_config']['shadows']['high_bitdepth']),
+    #         "-soft_shadows", str(render_info['eevee_config']['shadows']['soft_shadows']),
+    #     ]
 
 
     if render_type == "frame":
@@ -99,8 +99,8 @@ def build_sys_args_by_render_type(json_blender_render):
         if render_config['engine'] == "CYCLES" and not render_config['is_render_auto']:
             sys_args.extend(cycles_sys_args)
 
-        if render_config['engine'] == "BLENDER_EEVEE" and not render_config['is_render_auto']:
-            sys_args.extend(eevee_sys_args)
+        # if render_config['engine'] == "BLENDER_EEVEE" and not render_config['is_render_auto']:
+        #     sys_args.extend(eevee_sys_args)
       
 
     elif render_type == "animation":
@@ -131,8 +131,8 @@ def build_sys_args_by_render_type(json_blender_render):
         if render_config['engine'] == "CYCLES" and not render_config['is_render_auto']:
             sys_args.extend(cycles_sys_args)
 
-        if render_config['engine'] == "BLENDER_EEVEE" and not render_config['is_render_auto']:
-            sys_args.extend(eevee_sys_args)
+        # if render_config['engine'] == "BLENDER_EEVEE" and not render_config['is_render_auto']:
+        #     sys_args.extend(eevee_sys_args)
 
 
     else:

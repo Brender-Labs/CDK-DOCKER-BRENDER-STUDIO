@@ -130,11 +130,11 @@ def main():
         if args.engine == "BLENDER_EEVEE":
             print("engine:", args.engine)
             # llamar a funcion para configurar eevee config (pasarle los argumentos necesarios)
-            set_eevee_config(args.taa_samples, 
-                             args.cube_size, 
-                             args.cascade_size, 
-                             args.high_bitdepth, 
-                             args.soft_shadows)
+            # set_eevee_config(args.taa_samples, 
+            #                  args.cube_size, 
+            #                  args.cascade_size, 
+            #                  args.high_bitdepth, 
+            #                  args.soft_shadows)
 
             if args.render_type == "frame":
                 render_still(args.active_frame)
